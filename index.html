@@ -3,1029 +3,325 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لعبة صيد الكنز - تليجرام</title>
+  
+  <!-- كود التحقق الخاص بك من Monetag -->
+  <meta name="monetag" content="1e3a7c72aecb6ba55a69d3ce10ea97a2">
+
+  <title>لعبة لغز الكتل - Block Puzzle</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <!-- Google Fonts (Cairo) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- ========== كود AdsGram المُحدّث (المستقر) ========== -->
-  <!-- تم تغيير الرابط إلى الإصدار المستقر الجديد -->
-  <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            cairo: ['Cairo', 'sans-serif'],
-          },
-          colors: {
-            telegram: {
-              dark: '#0f172a',
-              card: '#1e293b',
-              accent: '#38bdf8',
-              success: '#10b981',
-              gold: '#f59e0b',
-              danger: '#ef4444'
-            }
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #38bdf8;
-      border-radius: 10px;
-    }
-
-    .glow-accent {
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-    }
-    .glow-gold {
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-    }
-    
-    #wheel {
-      transition: transform 5s cubic-bezier(0.1, 0.8, 0.1, 1);
-    }
-
-    @keyframes roll {
-      0% { transform: scale(1) rotate(0deg); }
-      20% { transform: scale(1.2) rotate(72deg); }
-      40% { transform: scale(0.9) rotate(144deg); }
-      60% { transform: scale(1.1) rotate(216deg); }
-      80% { transform: scale(0.95) rotate(288deg); }
-      100% { transform: scale(1) rotate(360deg); }
-    }
-    .rolling {
-      animation: roll 0.6s ease-in-out infinite;
-    }
+    body { font-family: 'Cairo', sans-serif; user-select: none; }
+    .grid-cell { width: 34px; height: 34px; transition: all 0.15s ease; }
+    .block-preview-cell { width: 16px; height: 16px; }
   </style>
 </head>
-<body class="bg-telegram-dark text-white min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between overflow-x-hidden p-4">
 
-  <!-- Header Banner -->
-  <header class="bg-telegram-card border-b border-slate-700/50 p-4 sticky top-0 z-50 shadow-md">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3 space-x-reverse">
-        <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=LuckyBot" class="w-10 h-10 rounded-full border-2 border-telegram-accent" alt="Avatar">
-        <div>
-          <h1 id="user-display-name" class="font-bold text-sm text-white">لاعب الكنز</h1>
-          <p class="text-xs text-slate-400">صياد جوائز تليجرام</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-2 space-x-reverse bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700">
-        <i class="fa-solid fa-coins text-telegram-gold text-lg animate-pulse"></i>
-        <span id="global-points" class="font-black text-telegram-gold text-base">2500</span>
-        <span class="text-xs text-slate-400">نقطة</span>
-      </div>
+  <!-- الرأس وعرض النقاط -->
+  <header class="max-w-md mx-auto w-full flex justify-between items-center bg-slate-850 p-3 rounded-2xl border border-slate-700/50 shadow-lg">
+    <div class="flex items-center space-x-2 space-x-reverse">
+      <i class="fa-solid fa-cube text-indigo-400 text-2xl animate-pulse"></i>
+      <h1 class="text-lg font-black bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">لغز الكتل الذهبي</h1>
+    </div>
+    <div class="bg-slate-800 px-4 py-1.5 rounded-full border border-slate-600 flex items-center space-x-2 space-x-reverse">
+      <i class="fa-solid fa-trophy text-amber-400"></i>
+      <span id="score" class="font-bold text-amber-400 text-lg">0</span>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="flex-grow max-w-md mx-auto w-full px-4 py-6 pb-24 overflow-y-auto">
+  <!-- ساحة اللعب الرئيسية -->
+  <main class="flex-grow max-w-md mx-auto w-full flex flex-col items-center justify-center my-4 space-y-6">
+    
+    <!-- شبكة اللعب 8x8 -->
+    <div id="game-board" class="bg-slate-950 p-2 rounded-2xl border-4 border-slate-800 grid grid-cols-8 gap-1 shadow-2xl relative">
+      <!-- الخلايا سيتم إنشاؤها عبر الجافا سكريبت -->
+    </div>
 
-    <!-- TAB 1: WHEEL -->
-    <section id="tab-wheel" class="tab-content space-y-6">
-      <div class="text-center space-y-2">
-        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-indigo-400">عجلة الحظ الذهبية</h2>
-        <p class="text-xs text-slate-400">در العجلة واربح النقاط القيمة واستخدمها للرهانات!</p>
-      </div>
-
-      <div class="relative w-72 h-72 mx-auto my-4 flex items-center justify-center">
-        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-30 drop-shadow-lg">
-          <i class="fa-solid fa-caret-down text-telegram-danger text-4xl animate-bounce"></i>
-        </div>
-        <div class="absolute inset-0 rounded-full border-4 border-slate-700 glow-accent z-10 pointer-events-none"></div>
-        <canvas id="wheel" width="280" height="280" class="rounded-full shadow-2xl z-0"></canvas>
-        <div class="absolute w-12 h-12 bg-slate-900 rounded-full border-4 border-slate-700 flex items-center justify-center z-20 shadow-md">
-          <i class="fa-solid fa-star text-telegram-gold animate-spin" style="animation-duration: 3s"></i>
-        </div>
-      </div>
-
-      <div class="space-y-4 pt-2">
-        <button id="btn-spin" onclick="spinWheel()" class="w-full bg-gradient-to-r from-telegram-accent to-blue-600 hover:from-blue-500 hover:to-telegram-accent text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center space-x-3 space-x-reverse glow-accent text-lg">
-          <i class="fa-solid fa-arrows-spin text-xl"></i>
-          <span>أدر العجلة الآن! (لفّة واحدة)</span>
-        </button>
-
-        <div class="bg-telegram-card border border-slate-700/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-          <div class="text-right">
-            <h3 class="font-bold text-sm text-slate-200">بحاجة إلى لفة مجانية؟</h3>
-            <p class="text-xs text-slate-400">شاهد إعلان فيديو قصير واكسب لفة مجانية فوراً</p>
-          </div>
-          <button id="btn-watch-ad" onclick="watchAd()" class="w-full sm:w-auto bg-gradient-to-r from-telegram-success to-emerald-600 hover:from-emerald-500 hover:to-telegram-success text-white font-bold py-2.5 px-5 rounded-xl shadow transition duration-300 transform active:scale-95 flex items-center justify-center space-x-2 space-x-reverse text-sm">
-            <i class="fa-solid fa-circle-play"></i>
-            <span>شاهد إعلان واربح لفة</span>
-          </button>
-        </div>
-
-        <div class="text-center text-xs text-slate-400 flex items-center justify-center space-x-2 space-x-reverse">
-          <span>لفاتك المتاحة حالياً:</span>
-          <span id="available-spins" class="bg-slate-800 text-telegram-accent font-bold px-3 py-1 rounded-full border border-slate-700">1</span>
-        </div>
-      </div>
-
-      <div id="wheel-notification" class="hidden bg-slate-900/60 border border-telegram-accent/20 rounded-2xl p-4 text-center transform scale-95 transition-all duration-500">
-        <p id="wheel-result-text" class="font-black text-telegram-accent text-lg"></p>
-      </div>
-    </section>
-
-    <!-- TAB 2: BETTING -->
-    <section id="tab-betting" class="tab-content hidden space-y-6">
-      <div class="text-center space-y-2">
-        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-gold to-orange-400">رهان النرد الثلاثي التنافسي</h2>
-        <p class="text-xs text-slate-400">راهن بنقاطك وتنافس ضد لاعبين آخرين، صاحب أعلى مجموع نرد يفوز بكامل الرهان!</p>
-      </div>
-
-      <div id="bet-setup-ui" class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <div class="space-y-3">
-          <label class="block text-sm font-bold text-slate-300 text-right"><i class="fa-solid fa-coins text-telegram-gold ml-2"></i>كم عدد النقاط التي تريد المراهنة بها؟</label>
-          <div class="grid grid-cols-3 gap-2.5">
-            <button onclick="selectBetAmount(50)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="50">50</button>
-            <button onclick="selectBetAmount(100)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="100">100</button>
-            <button onclick="selectBetAmount(150)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="150">150</button>
-            <button onclick="selectBetAmount(200)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="200">200</button>
-            <button onclick="selectBetAmount(500)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="500">500</button>
-            <button onclick="selectBetAmount(1000)" class="bet-chip bg-slate-800 hover:bg-slate-700 border-2 border-transparent text-slate-200 font-black py-3 rounded-xl transition duration-200 active:scale-95 text-sm" data-amount="1000">1000</button>
-          </div>
-        </div>
-
-        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-300 leading-relaxed flex items-start space-x-2 space-x-reverse">
-          <i class="fa-solid fa-circle-info text-base mt-0.5"></i>
-          <div>
-            <p class="font-bold mb-1">قوانين حاسمة لتكافؤ الفرص:</p>
-            <p>عند اكتمال الفريق (3/3)، سيكون لديك 5 ثوانٍ لرمي النرد. في حال الخروج أو التأخير، سيتم تفعيل الرمي التلقائي مع خصم 10% من نسبة حظك بالدورة القادمة عقوبة لعدم اللعب النشط.</p>
-          </div>
-        </div>
-
-        <button id="btn-start-matchmaking" onclick="startMatchmaking()" class="w-full bg-gradient-to-r from-telegram-gold to-yellow-600 hover:from-yellow-500 hover:to-telegram-gold text-slate-950 font-black py-4 px-6 rounded-2xl shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center space-x-3 space-x-reverse text-lg glow-gold">
-          <i class="fa-solid fa-gamepad text-xl"></i>
-          <span>تأكيد الرهان والبحث عن خصوم</span>
-        </button>
-      </div>
-
-      <div id="matchmaking-ui" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6 text-center">
-        <div class="py-4 space-y-3">
-          <div class="relative inline-block">
-            <div class="w-16 h-16 border-4 border-t-telegram-gold border-r-transparent border-b-telegram-gold border-l-transparent rounded-full animate-spin"></div>
-            <i class="fa-solid fa-users absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-telegram-gold"></i>
-          </div>
-          <h3 class="font-black text-lg text-slate-200">جاري البحث عن لاعبين حقيقيين...</h3>
-          <p class="text-xs text-slate-400">نجمع حالياً المنافسين لبدء رهان الـ <span id="wait-bet-amount" class="text-telegram-gold font-bold">0</span> نقطة</p>
-        </div>
-
-        <div class="bg-slate-900/60 rounded-2xl p-4 border border-slate-800">
-          <div class="flex justify-between text-xs text-slate-400 mb-2">
-            <span>الغرفة المفتوحة</span>
-            <span id="queue-status" class="font-bold text-telegram-gold">جاري التجهيز (1/3)</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
-            <div id="queue-progress-bar" class="bg-gradient-to-r from-telegram-gold to-amber-500 h-full rounded-full transition-all duration-1000" style="width: 33.33%"></div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div class="flex flex-col items-center bg-slate-800/40 p-3 rounded-xl border border-slate-700/30">
-            <img id="p1-img" src="" class="w-11 h-11 rounded-full border border-telegram-accent mb-2">
-            <span id="p1-name" class="text-xs font-bold truncate max-w-full">أنت</span>
-            <span class="text-[10px] text-telegram-success">مستعد <i class="fa-solid fa-check"></i></span>
-          </div>
-          <div class="flex flex-col items-center bg-slate-800/40 p-3 rounded-xl border border-slate-700/30">
-            <div id="p2-placeholder" class="w-11 h-11 rounded-full bg-slate-700 flex items-center justify-center mb-2 animate-pulse">
-              <i class="fa-solid fa-ellipsis text-slate-500 text-xs"></i>
-            </div>
-            <img id="p2-img" src="" class="w-11 h-11 rounded-full border border-slate-700 mb-2 hidden">
-            <span id="p2-name" class="text-xs text-slate-400 truncate max-w-full">انتظار...</span>
-            <span id="p2-status" class="text-[10px] text-slate-500">جاري التوصيل</span>
-          </div>
-          <div class="flex flex-col items-center bg-slate-800/40 p-3 rounded-xl border border-slate-700/30">
-            <div id="p3-placeholder" class="w-11 h-11 rounded-full bg-slate-700 flex items-center justify-center mb-2 animate-pulse">
-              <i class="fa-solid fa-ellipsis text-slate-500 text-xs"></i>
-            </div>
-            <img id="p3-img" src="" class="w-11 h-11 rounded-full border border-slate-700 mb-2 hidden">
-            <span id="p3-name" class="text-xs text-slate-400 truncate max-w-full">انتظار...</span>
-            <span id="p3-status" class="text-[10px] text-slate-500">جاري التوصيل</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="gameroom-ui" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <div class="flex items-center justify-between bg-slate-900/60 p-3.5 rounded-2xl border border-slate-700/30">
-          <div class="text-right">
-            <span id="game-status-label" class="text-xs text-slate-400">دورك الحالي لرمي النرد</span>
-            <h4 id="game-status-title" class="font-black text-sm text-telegram-gold">استعد للرمي!</h4>
-          </div>
-          <div class="flex items-center space-x-2 space-x-reverse">
-            <span class="text-xs text-slate-400">الوقت:</span>
-            <span id="countdown-timer" class="w-9 h-9 bg-telegram-danger text-white font-black rounded-full flex items-center justify-center animate-pulse text-sm">5</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 py-2">
-          <div id="player-card-0" class="flex flex-col items-center bg-slate-800/40 p-3.5 rounded-2xl border-2 border-telegram-accent relative transition duration-300">
-            <span class="absolute top-1 right-2 text-[10px] font-bold text-telegram-accent">أنت</span>
-            <img id="gp1-img" src="" class="w-12 h-12 rounded-full border-2 border-telegram-accent mb-2">
-            <span id="gp1-name" class="text-xs font-bold truncate max-w-full mb-1">أنت</span>
-            <div class="flex space-x-1 space-x-reverse justify-center my-2">
-              <span id="gp1-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp1-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp1-d3" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-            </div>
-            <div class="text-[10px] text-slate-400 mt-1">مجموع: <span id="gp1-total" class="font-bold text-telegram-accent text-sm">0</span></div>
-          </div>
-
-          <div id="player-card-1" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
-            <img id="gp2-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
-            <span id="gp2-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 2</span>
-            <div class="flex space-x-1 space-x-reverse justify-center my-2">
-              <span id="gp2-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp2-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp2-d3" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-            </div>
-            <div class="text-[10px] text-slate-400 mt-1">مجموع: <span id="gp2-total" class="font-bold text-slate-300 text-sm">0</span></div>
-          </div>
-
-          <div id="player-card-2" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
-            <img id="gp3-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
-            <span id="gp3-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 3</span>
-            <div class="flex space-x-1 space-x-reverse justify-center my-2">
-              <span id="gp3-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp3-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-              <span id="gp3-d3" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
-            </div>
-            <div class="text-[10px] text-slate-400 mt-1">مجموع: <span id="gp3-total" class="font-bold text-slate-300 text-sm">0</span></div>
-          </div>
-        </div>
-
-        <div class="bg-slate-900/60 rounded-2xl p-6 border border-slate-800 flex flex-col items-center justify-center space-y-4">
-          <div id="dice-visuals" class="flex space-x-4 space-x-reverse justify-center items-center h-20">
-            <div id="die-1" class="w-14 h-14 bg-slate-800 text-telegram-gold rounded-xl border border-slate-700 flex items-center justify-center font-black text-2xl shadow-md"><i class="fa-solid fa-dice-one"></i></div>
-            <div id="die-2" class="w-14 h-14 bg-slate-800 text-telegram-gold rounded-xl border border-slate-700 flex items-center justify-center font-black text-2xl shadow-md"><i class="fa-solid fa-dice-two"></i></div>
-            <div id="die-3" class="w-14 h-14 bg-slate-800 text-telegram-gold rounded-xl border border-slate-700 flex items-center justify-center font-black text-2xl shadow-md"><i class="fa-solid fa-dice-three"></i></div>
-          </div>
-
-          <button id="btn-roll-dice" onclick="rollUserDice()" class="w-full max-w-xs bg-gradient-to-r from-telegram-accent to-blue-600 hover:from-blue-500 hover:to-telegram-accent text-white font-extrabold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-2 space-x-reverse">
-            <i class="fa-solid fa-dice"></i>
-            <span>ارمِ النرد الـ 3 (الرمية المتبقية: <span id="rolls-left-label">3</span>)</span>
-          </button>
-        </div>
-
-        <div id="penalty-toast" class="hidden bg-red-500/15 border border-red-500/30 rounded-2xl p-3 text-center">
-          <p class="text-xs text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation ml-1.5 animate-bounce"></i> تم تفعيل الرمي التلقائي! تم خصم 10% من نسبة حظك بالدورة.</p>
-        </div>
-      </div>
-
-      <div id="game-result-modal" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-2xl space-y-4 text-center">
-        <div id="result-trophy" class="text-6xl text-telegram-gold animate-bounce py-2">
-          <i class="fa-solid fa-trophy"></i>
-        </div>
-        <h3 id="result-title" class="text-2xl font-black text-white">لقد فزت بالرهان!</h3>
-        <p id="result-desc" class="text-sm text-slate-400">حصلت على مجموع جبار وربحت النقاط بالكامل.</p>
-
-        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 max-w-xs mx-auto">
-          <div class="flex justify-between text-xs text-slate-400 border-b border-slate-800 pb-2 mb-2">
-            <span>الرهان الإجمالي:</span>
-            <span id="total-prize" class="font-bold text-telegram-gold">3000 نقطة</span>
-          </div>
-          <div class="flex justify-between text-xs text-slate-400">
-            <span>مجموع نردك:</span>
-            <span id="your-final-sum" class="font-black text-telegram-accent">15</span>
-          </div>
-        </div>
-
-        <button onclick="resetBettingUI()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-2xl border border-slate-700 transition">
-          العودة لإنشاء رهان جديد
-        </button>
-      </div>
-    </section>
-
-    <!-- TAB 3: CONVERT -->
-    <section id="tab-convert" class="tab-content hidden space-y-6">
-      <div class="text-center space-y-2">
-        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-emerald-400">تحويل النقاط الفوري للبوت</h2>
-        <p class="text-xs text-slate-400">قم بتحويل نقاط التطبيق التي جمعتها إلى نقاط حقيقية تضاف فوراً لرصيد البوت الرئيسي.</p>
-      </div>
-
-      <div class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <div class="space-y-4">
-          <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 relative">
-            <label class="block text-xs text-slate-400 mb-1.5 text-right">رصيد نقاط التطبيق الحالي</label>
-            <div class="flex items-center justify-between">
-              <input id="input-app-points" oninput="calculateConversion()" type="number" value="1000" min="1000" step="1000" class="bg-transparent text-2xl font-black text-telegram-gold focus:outline-none w-2/3 text-right">
-              <span class="text-sm font-bold text-slate-300">نقطة تطبيق</span>
-            </div>
-            <p class="text-[10px] text-slate-500 mt-1">الحد الأدنى للتحويل: 1,000 نقطة</p>
-          </div>
-
-          <div class="flex justify-center -my-2 relative z-10">
-            <div class="w-10 h-10 bg-telegram-accent text-slate-950 rounded-full border-4 border-telegram-dark flex items-center justify-center shadow-md animate-bounce">
-              <i class="fa-solid fa-arrow-down-long text-lg"></i>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 relative">
-            <label class="block text-xs text-slate-400 mb-1.5 text-right">ستحصل في بوت تليجرام الأساسي على</label>
-            <div class="flex items-center justify-between">
-              <span id="output-bot-points" class="text-2xl font-black text-telegram-success">1</span>
-              <span class="text-sm font-bold text-slate-300">نقطة بوت</span>
-            </div>
-            <p class="text-[10px] text-slate-500 mt-1">نسبة التحويل الثابتة: 1,000 نقطة للتطبيق مقابل 1 نقطة للبوت</p>
-          </div>
-        </div>
-
-        <button id="btn-convert" onclick="performConversion()" class="w-full bg-gradient-to-r from-telegram-success to-emerald-600 hover:from-emerald-500 hover:to-telegram-success text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-3 space-x-reverse text-lg">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>تحويل فوري إلى البوت الآن</span>
-        </button>
-      </div>
-
-      <div id="conversion-toast" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-center">
-        <p class="text-sm text-telegram-success font-bold mb-1"><i class="fa-solid fa-circle-check ml-1.5"></i> تمت عملية التحويل بنجاح وبدون تأخير!</p>
-        <p class="text-xs text-slate-400">تم إرسال النقاط ورصيد البوت الرئيسي محدث بالكامل الآن.</p>
-      </div>
-    </section>
-
-    <!-- TAB 4: SETTINGS -->
-    <section id="tab-settings" class="tab-content hidden space-y-6">
-      <div class="text-center space-y-2">
-        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-slate-200 to-slate-400">إعدادات ملف اللاعب الشخصي</h2>
-        <p class="text-xs text-slate-400">خصص مظهرك في ردهات الرهان ليراك الخصوم بطابعك وميزتك الفريدة.</p>
-      </div>
-
-      <div class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <div class="flex flex-col items-center space-y-3">
-          <label class="block text-sm font-bold text-slate-300">الصورة الرمزية الحالية</label>
-          <div class="relative group">
-            <img id="settings-avatar-preview" src="https://api.dicebear.com/7.x/bottts/svg?seed=LuckyBot" class="w-24 h-24 rounded-full border-4 border-telegram-accent p-1 shadow-lg bg-slate-900 transition duration-300">
-            <button onclick="changeAvatarSeed()" class="absolute bottom-0 right-0 bg-telegram-accent text-slate-950 w-8 h-8 rounded-full border-2 border-telegram-card flex items-center justify-center shadow hover:bg-white transition">
-              <i class="fa-solid fa-shuffle text-xs"></i>
-            </button>
-          </div>
-          <span class="text-[10px] text-slate-500">اضغط على زر التبديل لتوليد وجه عشوائي مميز بالذكاء الاصطناعي</span>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-bold text-slate-300 text-right"><i class="fa-solid fa-signature text-telegram-accent ml-2"></i>اسم اللاعب المستعار</label>
-          <input id="input-username" type="text" placeholder="اكتب اسمك المستعار هنا..." value="صياد_الكنوز" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-telegram-accent text-slate-200 text-right font-bold transition">
-        </div>
-
-        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
-          <div class="flex justify-between text-slate-400">
-            <span>نوع الهوية:</span>
-            <span class="font-bold text-telegram-accent">صياد الكنوز</span>
-          </div>
-          <div class="flex justify-between text-slate-400">
-            <span>تاريخ الانضمام:</span>
-            <span class="font-bold text-slate-300">اليوم</span>
-          </div>
-          <div class="flex justify-between text-slate-400">
-            <span>الحساب المربوط:</span>
-            <span id="telegram-id" class="font-bold text-slate-300">حساب تليجرام</span>
-          </div>
-          <div class="flex justify-between text-slate-400">
-            <span>معرف المطور:</span>
-            <span class="font-bold text-telegram-accent">38181</span>
-          </div>
-        </div>
-
-        <button onclick="saveSettings()" class="w-full bg-slate-100 hover:bg-white text-slate-950 font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-2 space-x-reverse">
-          <i class="fa-solid fa-floppy-disk text-lg"></i>
-          <span>حفظ إعدادات الملف الشخصي</span>
-        </button>
-      </div>
-    </section>
-
+    <!-- مكان اختيار وتوليد الكتل (3 خيارات متوفرة) -->
+    <div class="w-full bg-slate-850/60 p-4 rounded-2xl border border-slate-850 flex justify-around items-center gap-2">
+      <div id="piece-0" onclick="selectPiece(0)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
+      <div id="piece-1" onclick="selectPiece(1)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
+      <div id="piece-2" onclick="selectPiece(2)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
+    </div>
   </main>
 
-  <!-- Bottom Navigation -->
-  <nav class="bg-slate-900/95 border-t border-slate-800/80 p-3 fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md shadow-2xl">
-    <div class="max-w-md mx-auto grid grid-cols-4 gap-1 text-center">
-      <button onclick="switchTab('wheel', this)" class="nav-btn text-telegram-accent flex flex-col items-center space-y-1 transition-all duration-300">
-        <div class="w-10 h-10 rounded-xl bg-telegram-accent/10 flex items-center justify-center transition">
-          <i class="fa-solid fa-circle-notch text-xl"></i>
-        </div>
-        <span class="text-[10px] font-black">عجلة الحظ</span>
-      </button>
-
-      <button onclick="switchTab('betting', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center transition">
-          <i class="fa-solid fa-dice text-xl"></i>
-        </div>
-        <span class="text-[10px] font-black">الرهان</span>
-      </button>
-
-      <button onclick="switchTab('convert', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center transition font-bold text-lg">
-          <i class="fa-solid fa-right-left text-xl"></i>
-        </div>
-        <span class="text-[10px] font-black">تحويل</span>
-      </button>
-
-      <button onclick="switchTab('settings', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center transition">
-          <i class="fa-solid fa-gear text-xl"></i>
-        </div>
-        <span class="text-[10px] font-black">الإعدادات</span>
-      </button>
+  <!-- واجهة الإعلانات المنبثقة المحاكية (تنبثق تلقائياً لحين تفعيل سكريبت Monetag) -->
+  <div id="ad-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-850 border border-slate-700 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto text-2xl animate-spin">
+        <i class="fa-solid fa-rectangle-ad"></i>
+      </div>
+      <h3 class="text-xl font-bold">جاري تحميل العرض الإعلاني...</h3>
+      <p class="text-xs text-slate-400">انتظر 3 ثوانٍ لدعم استمرار اللعب مجاناً.</p>
+      <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+        <div id="ad-progress" class="bg-indigo-500 h-full w-0 transition-all duration-3000 ease-linear"></div>
+      </div>
     </div>
-  </nav>
+  </div>
+
+  <!-- واجهة الخسارة ونهاية اللعبة -->
+  <div id="game-over-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-40 flex items-center justify-center p-4">
+    <div class="bg-slate-850 border border-slate-700 w-full max-w-sm rounded-3xl p-6 text-center space-y-6 shadow-2xl">
+      <i class="fa-solid fa-heart-crack text-rose-500 text-6xl animate-bounce"></i>
+      <div>
+        <h2 class="text-2xl font-black text-rose-400">انتهت الحركات المتاحة!</h2>
+        <p class="text-sm text-slate-400 mt-1">مجموع نقاطك الحالي هو: <span id="final-score" class="font-bold text-amber-400">0</span></p>
+      </div>
+
+      <div class="space-y-3">
+        <!-- زر إكمال اللعب عبر مشاهدة الإعلان -->
+        <button onclick="watchAdToContinue()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center space-x-2 space-x-reverse shadow-lg transition duration-200 transform active:scale-95">
+          <i class="fa-solid fa-circle-play text-xl"></i>
+          <span>شاهد إعلان وتابع اللعب بنفس النقاط</span>
+        </button>
+
+        <!-- زر إعادة المباراة بالكامل من الصفر -->
+        <button onclick="triggerNewGameWithAd()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-2xl border border-slate-700 transition">
+          مباراة جديدة (شاهد إعلان وابدأ)
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // ========== المعرف الإضافي ==========
-    const DEVELOPER_ID = 38181;
+    const BOARD_SIZE = 8;
+    let board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(0));
+    let score = 0;
+    let currentPieces = [];
+    let selectedPieceIndex = null;
+    let isGameOver = false;
 
-    // ========== الحالة العامة ==========
-    let points = 2500;
-    let spinsLeft = 1;
-    let selectedBet = 50;
-    let username = "صياد_الكنوز";
-    let avatarSeed = "LuckyBot";
-    let hasPenalty = false;
-
-    // ========== العناصر ==========
-    const userAvatar = document.getElementById('user-avatar');
-    const userDisplayName = document.getElementById('user-display-name');
-    const globalPointsText = document.getElementById('global-points');
-    const availableSpinsText = document.getElementById('available-spins');
-    const inputUsername = document.getElementById('input-username');
-    const settingsAvatarPreview = document.getElementById('settings-avatar-preview');
-    const telegramIdLabel = document.getElementById('telegram-id');
-
-    // ========== تهيئة تليجرام ==========
-    window.onload = function() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const webapp = window.Telegram.WebApp;
-        webapp.ready();
-        webapp.expand();
-
-        const telegramUser = webapp.initDataUnsafe?.user;
-        if (telegramUser) {
-          username = telegramUser.username || telegramUser.first_name || "لاعب_تليجرام";
-          avatarSeed = telegramUser.id ? telegramUser.id.toString() : "LuckyBot";
-          telegramIdLabel.innerText = "@" + (telegramUser.username || telegramUser.id);
-          
-          userDisplayName.innerText = username;
-          inputUsername.value = username;
-          
-          const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-          userAvatar.src = avatarUrl;
-          settingsAvatarPreview.src = avatarUrl;
-        }
-      }
-      
-      drawWheel();
-      calculateConversion();
-    };
-
-    // ========== التنقل بين التبويبات ==========
-    function switchTab(tabId, btnElement) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('text-telegram-accent');
-        btn.classList.add('text-slate-400');
-        btn.querySelector('div').classList.remove('bg-telegram-accent/10');
-      });
-
-      btnElement.classList.remove('text-slate-400');
-      btnElement.classList.add('text-telegram-accent');
-      btnElement.querySelector('div').classList.add('bg-telegram-accent/10');
-    }
-
-    // ========== عجلة الحظ ==========
-    const prizes = [
-      { text: "50 نقطة", prob: 0.77, val: 50 },
-      { text: "حظ أوفر", prob: 0.41, val: 0 },
-      { text: "20 نقطة", prob: 0.66, val: 20 },
-      { text: "40 نقطة", prob: 0.69, val: 40 },
-      { text: "100 نقطة", prob: 0.16, val: 100 },
-      { text: "إعادة", prob: 0.50, val: "spin" },
-      { text: "70 نقطة", prob: 0.34, val: 70 },
-      { text: "10 نقاط", prob: 0.86, val: 10 },
-      { text: "30 نقطة", prob: 0.76, val: 30 },
-      { text: "حظ أوفر", prob: 0.59, val: 0 }
+    // أشكال الكتل البرمجية الجاهزة (1=خلية ممتلئة)
+    const SHAPES = [
+      [[1]], // كتلة مفردة
+      [[1, 1]], // خط أفقي ثنائي
+      [[1], [1]], // خط عمودي ثنائي
+      [[1, 1, 1]], // خط أفقي ثلاثي
+      [[1, 1], [1, 1]], // مربع 2x2
+      [[1, 0], [1, 1]], // شكل L صغير
+      [[1, 1, 1], [0, 1, 0]] // شكل T
     ];
 
-    const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
-    const numSegments = prizes.length;
-    const segmentAngle = (2 * Math.PI) / numSegments;
-    const colors = ["#1e293b", "#334155", "#0f172a", "#334155", "#1e293b", "#334155", "#0f172a", "#334155", "#1e293b", "#334155"];
+    // تشغيل اللعبة عند فتح الصفحة بمباراة أولى وإعلان مدمج
+    window.onload = function() {
+      createBoardUI();
+      triggerNewGameWithAd();
+    };
 
-    function drawWheel() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const radius = canvas.width / 2;
-      ctx.translate(radius, radius);
-
-      for (let i = 0; i < numSegments; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, radius - 10, i * segmentAngle, (i + 1) * segmentAngle);
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fill();
-        ctx.stroke();
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 2;
-
-        ctx.save();
-        ctx.rotate(i * segmentAngle + segmentAngle / 2);
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = i % 2 === 0 ? "#38bdf8" : "#f59e0b";
-        ctx.font = "bold 11px Cairo";
-        ctx.fillText(prizes[i].text, radius - 25, 0);
-        ctx.restore();
-      }
-      ctx.translate(-radius, -radius);
-    }
-
-    let isSpinning = false;
-    let currentRotation = 0;
-
-    function spinWheel() {
-      if (isSpinning) return;
-      if (spinsLeft <= 0) {
-        showGlobalAlert("لا تمتلك أي لفات متبقية! شاهد إعلاناً لكسب لفة مجانية.");
-        return;
-      }
-
-      spinsLeft--;
-      availableSpinsText.innerText = spinsLeft;
-      isSpinning = true;
-
-      let sumOfWeights = prizes.reduce((acc, prize) => acc + prize.prob, 0);
-      let rand = Math.random() * sumOfWeights;
-      let selectedIndex = 0;
-      
-      for (let i = 0; i < prizes.length; i++) {
-        rand -= prizes[i].prob;
-        if (rand <= 0) {
-          selectedIndex = i;
-          break;
+    function createBoardUI() {
+      const boardEl = document.getElementById("game-board");
+      boardEl.innerHTML = "";
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.createElement("div");
+          cell.className = "grid-cell bg-slate-800 rounded-md cursor-pointer border border-slate-900/40";
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.onclick = () => placeSelectedPiece(r, c);
+          boardEl.appendChild(cell);
         }
-      }
-
-      const stopAngle = 3 * Math.PI / 2 - (selectedIndex * segmentAngle + segmentAngle / 2);
-      const extraSpins = 5 * 2 * Math.PI;
-      const targetRotation = extraSpins + stopAngle;
-
-      const wheelEl = document.getElementById("wheel");
-      wheelEl.style.transform = `rotate(${targetRotation}rad)`;
-      currentRotation = targetRotation;
-
-      setTimeout(() => {
-        isSpinning = false;
-        const prize = prizes[selectedIndex];
-        
-        const notificationBox = document.getElementById("wheel-notification");
-        const resultText = document.getElementById("wheel-result-text");
-        notificationBox.classList.remove("hidden");
-
-        if (prize.val === "spin") {
-          spinsLeft++;
-          availableSpinsText.innerText = spinsLeft;
-          resultText.innerText = "🎉 مبروك! حصلت على لفة مجانية إضافية!";
-          showGlobalAlert("حصلت على لفة مجانية إضافية!");
-        } else if (prize.val > 0) {
-          points += prize.val;
-          globalPointsText.innerText = points;
-          resultText.innerText = `🎉 مبروك! فزت بـ ${prize.val} نقطة!`;
-          showGlobalAlert(`تم إضافة ${prize.val} نقطة لحسابك!`);
-        } else {
-          resultText.innerText = "😢 حظ أوفر في المرة القادمة!";
-        }
-      }, 5000);
-    }
-
-    // ============================================================
-    // ========== الإعلان الحقيقي (المعدل حسب التحليل) ==========
-    // ============================================================
-    function watchAd() {
-      // 1. التأكد أن مكتبة AdsGram تم تحميلها
-      if (typeof adsgram !== 'undefined' && typeof adsgram.init === 'function') {
-        try {
-          // 2. تهيئة الإعلان بالـ Block ID الصحيح (38181)
-          const AdController = adsgram.init({ blockId: "38181" });
-          
-          // 3. عرض الإعلان ومعالجة النتائج عبر .show()
-          AdController.show().then((result) => {
-            // ✅ المستخدم شاهد الإعلان بالكامل (onReward)
-            spinsLeft++;
-            if (document.getElementById('available-spins')) {
-              document.getElementById('available-spins').innerText = spinsLeft;
-            }
-            showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
-          }).catch((error) => {
-            // معالجة الأخطاء (onError / onClose)
-            if (error.code === 'USER_CLOSE') {
-              showGlobalAlert("⏳ أغلقت الإعلان مبكراً، لم تحصل على المكافأة.");
-            } else {
-              showGlobalAlert("❌ لم تتوفر إعلانات حالياً، حاول مجدداً بعد قليل.");
-              console.error("AdsGram show error:", error);
-            }
-          });
-
-        } catch (e) {
-          showGlobalAlert("❌ فشل في إنشاء وحدة الإعلان، يرجى مراجعة الـ Block ID.");
-          console.error(e);
-        }
-      } else {
-        // الرسالة التي تظهر لك الآن بسبب فشل تحميل السكريبت في البداية
-        showGlobalAlert("⚠️ شبكة إعلانات AdsGram غير محملة. يرجى تحديث التطبيق أو استخدام اتصال إنترنت آخر بدون مانع إعلانات.");
       }
     }
 
-
-    // ========== الرهان ==========
-    function selectBetAmount(amount) {
-      selectedBet = amount;
-      document.querySelectorAll('.bet-chip').forEach(btn => {
-        btn.classList.remove('border-telegram-gold', 'bg-telegram-gold/10', 'text-telegram-gold');
-        btn.classList.add('bg-slate-800');
+    // شرطك الأول: عند دخول كل مباراة جديدة يشاهد إعلان
+    function triggerNewGameWithAd() {
+      document.getElementById("game-over-modal").classList.add("hidden");
+      showAd(() => {
+        resetGameData();
       });
+    }
 
-      const activeBtn = document.querySelector(`.bet-chip[data-amount="${amount}"]`);
-      if (activeBtn) {
-        activeBtn.classList.remove('bg-slate-800');
-        activeBtn.classList.add('border-telegram-gold', 'bg-telegram-gold/10', 'text-telegram-gold');
+    // شرطك الثاني: لو خسر يمكنه إكمال اللعب بمشاهدة إعلان
+    function watchAdToContinue() {
+      showAd(() => {
+        document.getElementById("game-over-modal").classList.add("hidden");
+        isGameOver = false;
+        generatePieces(); // يعطيه قطع جديدة للهروب من المأزق ومتابعة اللعب
+      });
+    }
+
+    function resetGameData() {
+      board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(0));
+      score = 0;
+      isGameOver = false;
+      document.getElementById("score").innerText = score;
+      updateBoardUI();
+      generatePieces();
+    }
+
+    // نظام محاكاة وعرض الإعلانات
+    function showAd(onComplete) {
+      const adModal = document.getElementById("ad-modal");
+      const adProgress = document.getElementById("ad-progress");
+      adModal.classList.remove("hidden");
+      adProgress.style.width = "100%";
+
+      // محاكاة إعلان لمدة 3 ثوانٍ
+      setTimeout(() => {
+        adModal.classList.add("hidden");
+        adProgress.style.width = "0%";
+        
+        // ========= مكان وضع سكريبت التحميل الذكي من Monetag مستقبلاً =========
+        // هنا يمكنك استدعاء دالة الإعلانات النقدية أو الـ Smart Tag من لوحة Monetag 
+        
+        onComplete();
+      }, 3000);
+    }
+
+    function generatePieces() {
+      currentPieces = [];
+      for (let i = 0; i < 3; i++) {
+        const randIndex = Math.floor(Math.random() * SHAPES.length);
+        currentPieces.push(SHAPES[randIndex]);
+        renderPiecePreview(i, SHAPES[randIndex]);
       }
+      checkGameOverCondition();
     }
 
-    let lobbyTimer;
-    let roomPlayers = [];
+    function renderPiecePreview(index, shape) {
+      const el = document.getElementById(`piece-${index}`);
+      el.innerHTML = "";
+      el.classList.remove("border-indigo-500", "bg-indigo-600/10");
+      el.style.opacity = "1";
 
-    function startMatchmaking() {
-      if (points < selectedBet) {
-        showGlobalAlert("رصيدك من النقاط غير كافٍ لدخول هذا الرهان!");
-        return;
+      const rows = shape.length;
+      const cols = shape[0].length;
+      
+      const grid = document.createElement("div");
+      grid.className = `grid gap-0.5`;
+      grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const previewCell = document.createElement("div");
+          previewCell.className = "block-preview-cell rounded-sm " + (shape[r][c] ? "bg-indigo-500 shadow" : "bg-transparent");
+          grid.appendChild(previewCell);
+        }
       }
-
-      points -= selectedBet;
-      globalPointsText.innerText = points;
-
-      document.getElementById("bet-setup-ui").classList.add("hidden");
-      document.getElementById("matchmaking-ui").classList.remove("hidden");
-      document.getElementById("wait-bet-amount").innerText = selectedBet;
-
-      const p1Img = document.getElementById("p1-img");
-      const p1Name = document.getElementById("p1-name");
-      p1Img.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-      p1Name.innerText = username;
-
-      let phase = 1;
-      const progress = document.getElementById("queue-progress-bar");
-      const qStatus = document.getElementById("queue-status");
-
-      lobbyTimer = setInterval(() => {
-        phase++;
-        if (phase === 2) {
-          document.getElementById("p2-placeholder").classList.add("hidden");
-          const p2Img = document.getElementById("p2-img");
-          p2Img.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Nico";
-          p2Img.classList.remove("hidden");
-          document.getElementById("p2-name").innerText = "سيف_تليجرام";
-          document.getElementById("p2-status").innerText = "جاهز";
-          document.getElementById("p2-status").className = "text-[10px] text-telegram-success";
-          
-          progress.style.width = "66.66%";
-          qStatus.innerText = "جاري التوصيل (2/3)";
-        } 
-        else if (phase === 3) {
-          document.getElementById("p3-placeholder").classList.add("hidden");
-          const p3Img = document.getElementById("p3-img");
-          p3Img.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Shadow";
-          p3Img.classList.remove("hidden");
-          document.getElementById("p3-name").innerText = "صقر_الصحراء";
-          document.getElementById("p3-status").innerText = "جاهز";
-          document.getElementById("p3-status").className = "text-[10px] text-telegram-success";
-          
-          progress.style.width = "100%";
-          qStatus.innerText = "تم اكتمال الفريق (3/3)";
-        }
-        else if (phase === 4) {
-          clearInterval(lobbyTimer);
-          setupGameRoom();
-        }
-      }, 1500);
+      el.appendChild(grid);
     }
 
-    let gameRound = 1;
-    let turnCount = 3;
-    let userDiceResults = [];
-    let opponent1DiceResults = [];
-    let opponent2DiceResults = [];
-    let countdownVal = 5;
-    let gameTimer;
-    let hasRolledThisTurn = false;
-
-    function setupGameRoom() {
-      document.getElementById("matchmaking-ui").classList.add("hidden");
-      document.getElementById("gameroom-ui").classList.remove("hidden");
-
-      document.getElementById("gp1-img").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-      document.getElementById("gp1-name").innerText = username;
-
-      document.getElementById("gp2-img").src = "https://api.dicebear.com/7.x/bottts/svg?seed=Nico";
-      document.getElementById("gp2-name").innerText = "سيف_تليجرام";
-
-      document.getElementById("gp3-img").src = "https://api.dicebear.com/7.x/bottts/svg?seed=Shadow";
-      document.getElementById("gp3-name").innerText = "صقر_الصحراء";
-
-      userDiceResults = [];
-      opponent1DiceResults = [];
-      opponent2DiceResults = [];
-      turnCount = 3;
-      hasRolledThisTurn = false;
-      document.getElementById("rolls-left-label").innerText = turnCount;
-
-      startTurnCountdown();
+    function selectPiece(index) {
+      if (currentPieces[index] === null || isGameOver) return;
+      selectedPieceIndex = index;
+      
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`piece-${i}`).classList.remove("border-indigo-500", "bg-indigo-600/10");
+      }
+      document.getElementById(`piece-${index}`).classList.add("border-indigo-500", "bg-indigo-600/10");
     }
 
-    function startTurnCountdown() {
-      countdownVal = 5;
-      document.getElementById("countdown-timer").innerText = countdownVal;
-
-      gameTimer = setInterval(() => {
-        countdownVal--;
-        document.getElementById("countdown-timer").innerText = countdownVal;
-
-        if (countdownVal <= 0) {
-          clearInterval(gameTimer);
-          if (!hasRolledThisTurn) {
-            triggerAutomatedRollPenalty();
+    function placeSelectedPiece(row, col) {
+      if (selectedPieceIndex === null) return;
+      const shape = currentPieces[selectedPieceIndex];
+      
+      if (canPlacePiece(row, col, shape)) {
+        for (let r = 0; r < shape.length; r++) {
+          for (let c = 0; c < shape[0].length; c++) {
+            if (shape[r][c]) {
+              board[row + r][col + c] = 1;
+            }
           }
         }
-      }, 1000);
-    }
-
-    function triggerAutomatedRollPenalty() {
-      hasPenalty = true;
-      document.getElementById("penalty-toast").classList.remove("hidden");
-      
-      while(turnCount > 0) {
-        let r1 = Math.floor(Math.random() * 5) + 1;
-        let r2 = Math.floor(Math.random() * 5) + 1;
-        let r3 = Math.floor(Math.random() * 5) + 1;
         
-        userDiceResults.push(r1, r2, r3);
-        turnCount--;
-      }
+        document.getElementById(`piece-${selectedPieceIndex}`).innerHTML = "";
+        document.getElementById(`piece-${selectedPieceIndex}`).style.opacity = "0.2";
+        currentPieces[selectedPieceIndex] = null;
+        selectedPieceIndex = null;
+        
+        score += 10;
+        checkLines();
+        updateBoardUI();
 
-      finalizeDiceResults();
-    }
-
-    function rollUserDice() {
-      if (turnCount <= 0) return;
-      hasRolledThisTurn = true;
-      clearInterval(gameTimer);
-
-      const d1 = document.getElementById("die-1");
-      const d2 = document.getElementById("die-2");
-      const d3 = document.getElementById("die-3");
-
-      d1.classList.add("rolling");
-      d2.classList.add("rolling");
-      d3.classList.add("rolling");
-
-      setTimeout(() => {
-        d1.classList.remove("rolling");
-        d2.classList.remove("rolling");
-        d3.classList.remove("rolling");
-
-        let r1 = Math.floor(Math.random() * 6) + 1;
-        let r2 = Math.floor(Math.random() * 6) + 1;
-        let r3 = Math.floor(Math.random() * 6) + 1;
-
-        if (hasPenalty) {
-          r1 = Math.max(1, r1 - 1);
-          r2 = Math.max(1, r2 - 1);
-        }
-
-        userDiceResults.push(r1, r2, r3);
-
-        d1.innerHTML = getDiceIcon(r1);
-        d2.innerHTML = getDiceIcon(r2);
-        d3.innerHTML = getDiceIcon(r3);
-
-        const currentRollIndex = 3 - turnCount;
-        document.getElementById(`gp1-d${currentRollIndex + 1}`).innerText = userDiceResults[userDiceResults.length - 1];
-
-        const userSum = userDiceResults.reduce((a, b) => a + b, 0);
-        document.getElementById("gp1-total").innerText = userSum;
-
-        turnCount--;
-        document.getElementById("rolls-left-label").innerText = turnCount;
-
-        if (turnCount > 0) {
-          hasRolledThisTurn = false;
-          startTurnCountdown();
+        if (currentPieces.every(p => p === null)) {
+          generatePieces();
         } else {
-          simulateOpponentsTurn();
+          checkGameOverCondition();
         }
-      }, 800);
-    }
-
-    function getDiceIcon(val) {
-      const icons = [
-        '<i class="fa-solid fa-dice-one"></i>',
-        '<i class="fa-solid fa-dice-two"></i>',
-        '<i class="fa-solid fa-dice-three"></i>',
-        '<i class="fa-solid fa-dice-four"></i>',
-        '<i class="fa-solid fa-dice-five"></i>',
-        '<i class="fa-solid fa-dice-six"></i>'
-      ];
-      return icons[val - 1] || icons[0];
-    }
-
-    function simulateOpponentsTurn() {
-      document.getElementById("game-status-label").innerText = "جاري لعب الخصوم";
-      document.getElementById("game-status-title").innerText = "خصومك يرمون النرد الآن...";
-
-      setTimeout(() => {
-        opponent1DiceResults = [
-          Math.floor(Math.random() * 6) + 1,
-          Math.floor(Math.random() * 6) + 1,
-          Math.floor(Math.random() * 6) + 1
-        ];
-        document.getElementById("gp2-d1").innerText = opponent1DiceResults[0];
-        document.getElementById("gp2-d2").innerText = opponent1DiceResults[1];
-        document.getElementById("gp2-d3").innerText = opponent1DiceResults[2];
-        const sum2 = opponent1DiceResults.reduce((a, b) => a + b, 0);
-        document.getElementById("gp2-total").innerText = sum2;
-
-        opponent2DiceResults = [
-          Math.floor(Math.random() * 6) + 1,
-          Math.floor(Math.random() * 6) + 1,
-          Math.floor(Math.random() * 6) + 1
-        ];
-        document.getElementById("gp3-d1").innerText = opponent2DiceResults[0];
-        document.getElementById("gp3-d2").innerText = opponent2DiceResults[1];
-        document.getElementById("gp3-d3").innerText = opponent2DiceResults[2];
-        const sum3 = opponent2DiceResults.reduce((a, b) => a + b, 0);
-        document.getElementById("gp3-total").innerText = sum3;
-
-        setTimeout(() => {
-          finalizeDiceResults();
-        }, 1000);
-
-      }, 1500);
-    }
-
-    function finalizeDiceResults() {
-      document.getElementById("gameroom-ui").classList.add("hidden");
-      document.getElementById("game-result-modal").classList.remove("hidden");
-
-      const userSum = userDiceResults.reduce((a, b) => a + b, 0) || 0;
-      const sum2 = opponent1DiceResults.reduce((a, b) => a + b, 0) || Math.floor(Math.random() * 12) + 4;
-      const sum3 = opponent2DiceResults.reduce((a, b) => a + b, 0) || Math.floor(Math.random() * 12) + 4;
-
-      const trophy = document.getElementById("result-trophy");
-      const title = document.getElementById("result-title");
-      const desc = document.getElementById("result-desc");
-      const totalPrizeText = document.getElementById("total-prize");
-      const yourFinalSumText = document.getElementById("your-final-sum");
-
-      yourFinalSumText.innerText = userSum;
-
-      if (userSum >= sum2 && userSum >= sum3) {
-        const winnings = selectedBet * 3;
-        points += winnings;
-        globalPointsText.innerText = points;
-
-        trophy.innerHTML = '<i class="fa-solid fa-trophy text-telegram-gold text-6xl"></i>';
-        title.innerText = "👑 لقد فزت بالرهان!";
-        title.className = "text-2xl font-black text-telegram-gold";
-        desc.innerText = `رائع! مجموع نردك أعلى من الخصوم. ربحت الرهان بالكامل وحصلت على الأرباح.`;
-        totalPrizeText.innerText = `+${winnings} نقطة`;
-        totalPrizeText.className = "font-bold text-telegram-success";
-      } else {
-        trophy.innerHTML = '<i class="fa-solid fa-circle-xmark text-telegram-danger text-6xl"></i>';
-        title.innerText = "😢 حظاً أوفر!";
-        title.className = "text-2xl font-black text-telegram-danger";
-        desc.innerText = `للأسف حصل أحد المنافسين على مجموع نرد أعلى منك هذه المرة.`;
-        totalPrizeText.innerText = `-${selectedBet} نقطة`;
-        totalPrizeText.className = "font-bold text-telegram-danger";
       }
     }
 
-    function resetBettingUI() {
-      document.getElementById("game-result-modal").classList.add("hidden");
-      document.getElementById("penalty-toast").classList.add("hidden");
-      document.getElementById("bet-setup-ui").classList.remove("hidden");
-      
-      document.getElementById("gp1-total").innerText = "0";
-      document.getElementById("gp2-total").innerText = "0";
-      document.getElementById("gp3-total").innerText = "0";
+    function canPlacePiece(row, col, shape) {
+      if (row + shape.length > BOARD_SIZE || col + shape[0].length > BOARD_SIZE) return false;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[0].length; c++) {
+          if (shape[r][c] && board[row + r][col + c] === 1) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
 
-      for (let i = 1; i <= 3; i++) {
-        document.getElementById(`gp1-d${i}`).innerText = "-";
-        document.getElementById(`gp2-d${i}`).innerText = "-";
-        document.getElementById(`gp3-d${i}`).innerText = "-";
+    function checkLines() {
+      let rowsToRemove = [];
+      let colsToRemove = [];
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        if (board[r].every(val => val === 1)) rowsToRemove.push(r);
+      }
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        let colFull = true;
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          if (board[r][c] === 0) colFull = false;
+        }
+        if (colFull) colsToRemove.push(c);
+      }
+
+      rowsToRemove.forEach(r => board[r].fill(0));
+      colsToRemove.forEach(c => {
+        for (let r = 0; r < BOARD_SIZE; r++) board[r][c] = 0;
+      });
+
+      if (rowsToRemove.length > 0 || colsToRemove.length > 0) {
+        score += (rowsToRemove.length + colsToRemove.length) * 20;
+        document.getElementById("score").innerText = score;
       }
     }
 
-    // ========== تحويل النقاط ==========
-    function calculateConversion() {
-      const input = document.getElementById("input-app-points").value;
-      const output = document.getElementById("output-bot-points");
-      
-      if (input >= 1000) {
-        const botPoints = Math.floor(input / 1000);
-        output.innerText = botPoints;
-      } else {
-        output.innerText = 0;
+    function updateBoardUI() {
+      const cells = document.getElementById("game-board").children;
+      let i = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === 1) {
+            cells[i].className = "grid-cell bg-indigo-600 rounded-md cursor-pointer border border-indigo-700 glow-indigo shadow-md";
+          } else {
+            cells[i].className = "grid-cell bg-slate-800 rounded-md cursor-pointer border border-slate-900/40";
+          }
+          i++;
+        }
       }
     }
 
-    function performConversion() {
-      const inputVal = parseInt(document.getElementById("input-app-points").value);
-      
-      if (isNaN(inputVal) || inputVal < 1000) {
-        showGlobalAlert("الحد الأدنى للتحويل هو 1000 نقطة تطبيق!");
-        return;
+    function checkGameOverCondition() {
+      let availableMoves = false;
+      for (let i = 0; i < currentPieces.length; i++) {
+        if (currentPieces[i] === null) continue;
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          for (let c = 0; c < BOARD_SIZE; c++) {
+            if (canPlacePiece(r, c, currentPieces[i])) {
+              availableMoves = true;
+            }
+          }
+        }
       }
-
-      if (points < inputVal) {
-        showGlobalAlert("رصيد نقاطك الحالي في التطبيق لا يكفي لإتمام هذه العملية!");
-        return;
+      if (!availableMoves) {
+        triggerGameOver();
       }
-
-      points -= inputVal;
-      globalPointsText.innerText = points;
-
-      const toast = document.getElementById("conversion-toast");
-      toast.classList.remove("hidden");
-
-      showGlobalAlert(`تم بنجاح تحويل ${inputVal} نقطة إلى رصيد البوت الرئيسي. (معرف المطور: ${DEVELOPER_ID})`);
-
-      setTimeout(() => {
-        toast.classList.add("hidden");
-      }, 5000);
     }
 
-    // ========== الإعدادات ==========
-    function changeAvatarSeed() {
-      avatarSeed = Math.random().toString(36).substring(7);
-      const newAvatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-      settingsAvatarPreview.src = newAvatarUrl;
-    }
-
-    function saveSettings() {
-      const newUsername = inputUsername.value.trim();
-      if (newUsername.length < 3) {
-        showGlobalAlert("يرجى كتابة اسم مستعار صالح لا يقل عن 3 أحرف.");
-        return;
-      }
-
-      username = newUsername;
-      userDisplayName.innerText = username;
-      userAvatar.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-
-      showGlobalAlert("تم حفظ وتحديث بيانات ملفك الشخصي بنجاح!");
-    }
-
-    // ========== التنبيهات العامة ==========
-    function showGlobalAlert(msg) {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.showPopup({
-          title: "إشعار الكنز",
-          message: msg,
-          buttons: [{ type: "ok", text: "موافق" }]
-        });
-      } else {
-        const alertBox = document.createElement("div");
-        alertBox.className = "fixed top-5 left-1/2 transform -translate-x-1/2 bg-telegram-card border-2 border-telegram-accent text-white px-6 py-3.5 rounded-2xl shadow-2xl z-[99999] text-sm text-center font-bold glow-accent animate-bounce";
-        alertBox.innerHTML = `<i class="fa-solid fa-bell text-telegram-accent ml-2"></i> ${msg}`;
-        document.body.appendChild(alertBox);
-        setTimeout(() => alertBox.remove(), 4000);
-      }
+    function triggerGameOver() {
+      isGameOver = true;
+      document.getElementById("final-score").innerText = score;
+      document.getElementById("game-over-modal").classList.remove("hidden");
     }
   </script>
 </body>
