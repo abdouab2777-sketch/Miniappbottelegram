@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- كود التحقق الخاص بك من Monetag -->
+  <!-- كود التحقق الخاص بك من Monetag (متروك للأمان ولتأكيد موقعك) -->
   <meta name="monetag" content="1e3a7c72aecb6ba55a69d3ce10ea97a2">
 
   <title>لعبة لغز الكتل - Block Puzzle</title>
   
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS للواجهات -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts (Cairo) -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome الأيقونات -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -41,30 +41,16 @@
     
     <!-- شبكة اللعب 8x8 -->
     <div id="game-board" class="bg-slate-950 p-2 rounded-2xl border-4 border-slate-800 grid grid-cols-8 gap-1 shadow-2xl relative">
-      <!-- الخلايا سيتم إنشاؤها عبر الجافا سكريبت -->
+      <!-- الخلايا يتم إنشاؤها عبر الجافا سكريبت -->
     </div>
 
-    <!-- مكان اختيار وتوليد الكتل (3 خيارات متوفرة) -->
+    <!-- مكان اختيار وتوليد الكتل الثلاثة -->
     <div class="w-full bg-slate-850/60 p-4 rounded-2xl border border-slate-850 flex justify-around items-center gap-2">
       <div id="piece-0" onclick="selectPiece(0)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
       <div id="piece-1" onclick="selectPiece(1)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
       <div id="piece-2" onclick="selectPiece(2)" class="p-2 bg-slate-800/40 rounded-xl border-2 border-transparent cursor-pointer hover:border-indigo-500/50 flex flex-col items-center min-w-[80px] min-h-[80px] justify-center"></div>
     </div>
   </main>
-
-  <!-- واجهة الإعلانات المنبثقة المحاكية (تنبثق تلقائياً لحين تفعيل سكريبت Monetag) -->
-  <div id="ad-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-850 border border-slate-700 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto text-2xl animate-spin">
-        <i class="fa-solid fa-rectangle-ad"></i>
-      </div>
-      <h3 class="text-xl font-bold">جاري تحميل العرض الإعلاني...</h3>
-      <p class="text-xs text-slate-400">انتظر 3 ثوانٍ لدعم استمرار اللعب مجاناً.</p>
-      <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-        <div id="ad-progress" class="bg-indigo-500 h-full w-0 transition-all duration-3000 ease-linear"></div>
-      </div>
-    </div>
-  </div>
 
   <!-- واجهة الخسارة ونهاية اللعبة -->
   <div id="game-over-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-40 flex items-center justify-center p-4">
@@ -76,13 +62,13 @@
       </div>
 
       <div class="space-y-3">
-        <!-- زر إكمال اللعب عبر مشاهدة الإعلان -->
+        <!-- خيار إكمال اللعب بعد الخسارة بمشاهدة إعلان التوكن الخاص بك -->
         <button onclick="watchAdToContinue()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center space-x-2 space-x-reverse shadow-lg transition duration-200 transform active:scale-95">
           <i class="fa-solid fa-circle-play text-xl"></i>
           <span>شاهد إعلان وتابع اللعب بنفس النقاط</span>
         </button>
 
-        <!-- زر إعادة المباراة بالكامل من الصفر -->
+        <!-- خيار إعادة مباراة جديدة من الصفر مع مشاهدة إعلان -->
         <button onclick="triggerNewGameWithAd()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-2xl border border-slate-700 transition">
           مباراة جديدة (شاهد إعلان وابدأ)
         </button>
@@ -98,21 +84,21 @@
     let selectedPieceIndex = null;
     let isGameOver = false;
 
-    // أشكال الكتل البرمجية الجاهزة (1=خلية ممتلئة)
+    // أشكال الكتل البرمجية للعبة
     const SHAPES = [
       [[1]], // كتلة مفردة
       [[1, 1]], // خط أفقي ثنائي
-      [[1], [1]], // خط عمودي ثنائي
+      [[1], [1]], // line عمودي ثنائي
       [[1, 1, 1]], // خط أفقي ثلاثي
       [[1, 1], [1, 1]], // مربع 2x2
       [[1, 0], [1, 1]], // شكل L صغير
       [[1, 1, 1], [0, 1, 0]] // شكل T
     ];
 
-    // تشغيل اللعبة عند فتح الصفحة بمباراة أولى وإعلان مدمج
+    // تشغيل اللعبة فور تحميل الصفحة
     window.onload = function() {
       createBoardUI();
-      triggerNewGameWithAd();
+      resetGameData(); // تشغيل فوري بدون إعلان منبثق عند أول فتح للحفاظ على تجربة الدخول
     };
 
     function createBoardUI() {
@@ -130,7 +116,7 @@
       }
     }
 
-    // شرطك الأول: عند دخول كل مباراة جديدة يشاهد إعلان
+    // شرط البدء بمباراة جديدة مع عرض إعلان التوكن
     function triggerNewGameWithAd() {
       document.getElementById("game-over-modal").classList.add("hidden");
       showAd(() => {
@@ -138,13 +124,24 @@
       });
     }
 
-    // شرطك الثاني: لو خسر يمكنه إكمال اللعب بمشاهدة إعلان
+    // شرط إكمال اللعب بعد الخسارة عبر إعلان التوكن
     function watchAdToContinue() {
       showAd(() => {
         document.getElementById("game-over-modal").classList.add("hidden");
         isGameOver = false;
-        generatePieces(); // يعطيه قطع جديدة للهروب من المأزق ومتابعة اللعب
+        generatePieces(); // توليد قطع جديدة لإنقاذه من الخسارة
       });
+    }
+
+    // دالة تشغيل الإعلانات المدمجة مع التوكن (الرابط الذكي) الخاص بك من Adsterra
+    function showAd(onComplete) {
+      const adTokenURL = "Https://www.effectivecpmnetwork.com/t9522wu9e?key=a67ec5fc180e7ac4a44ebabb725a3299"; 
+      
+      // فتح رابط التوكن الإعلاني في نافذة منفصلة لتحقيق الأرباح
+      window.open(adTokenURL, '_blank');
+      
+      // تنفيذ الحدث التالي مباشرة (بدء المباراة أو إكمالها)
+      onComplete();
     }
 
     function resetGameData() {
@@ -154,25 +151,6 @@
       document.getElementById("score").innerText = score;
       updateBoardUI();
       generatePieces();
-    }
-
-    // نظام محاكاة وعرض الإعلانات
-    function showAd(onComplete) {
-      const adModal = document.getElementById("ad-modal");
-      const adProgress = document.getElementById("ad-progress");
-      adModal.classList.remove("hidden");
-      adProgress.style.width = "100%";
-
-      // محاكاة إعلان لمدة 3 ثوانٍ
-      setTimeout(() => {
-        adModal.classList.add("hidden");
-        adProgress.style.width = "0%";
-        
-        // ========= مكان وضع سكريبت التحميل الذكي من Monetag مستقبلاً =========
-        // هنا يمكنك استدعاء دالة الإعلانات النقدية أو الـ Smart Tag من لوحة Monetag 
-        
-        onComplete();
-      }, 3000);
     }
 
     function generatePieces() {
@@ -292,7 +270,7 @@
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
           if (board[r][c] === 1) {
-            cells[i].className = "grid-cell bg-indigo-600 rounded-md cursor-pointer border border-indigo-700 glow-indigo shadow-md";
+            cells[i].className = "grid-cell bg-indigo-600 rounded-md cursor-pointer border border-indigo-700 shadow-md";
           } else {
             cells[i].className = "grid-cell bg-slate-800 rounded-md cursor-pointer border border-slate-900/40";
           }
