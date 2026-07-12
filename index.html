@@ -94,21 +94,6 @@
     .rolling {
       animation: roll 0.6s ease-in-out infinite;
     }
-
-    /* تنسيق زر الإعلان المعطل/المفعل */
-    #ad-claim-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      filter: grayscale(0.8);
-    }
-    #ad-claim-btn:enabled {
-      animation: pulse-green 1.5s infinite;
-    }
-    @keyframes pulse-green {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
   </style>
 </head>
 <body class="bg-telegram-dark text-white min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -480,31 +465,6 @@
     </div>
   </nav>
 
-  <!-- ========== طبقة الإعلان (محاكاة مؤقتة لحين ظهور AdsGram) ========== -->
-  <div id="ad-overlay" class="hidden fixed inset-0 bg-slate-950/95 z-[999] flex flex-col items-center justify-center p-6 text-center">
-    <div class="w-full max-w-sm bg-telegram-card border border-slate-700/60 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-12 -left-12 w-24 h-24 bg-telegram-success/20 rounded-full blur-2xl"></div>
-      
-      <div class="space-y-4">
-        <div class="w-16 h-16 bg-telegram-success/10 text-telegram-success rounded-full flex items-center justify-center text-3xl mx-auto">
-          <i class="fa-solid fa-circle-play animate-pulse"></i>
-        </div>
-        <h3 class="text-xl font-black text-white">إعلان فيديو ترويجي</h3>
-        <p id="ad-status-text" class="text-xs text-slate-400">جاري تحميل الإعلان، يرجى الانتظار...</p>
-        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-          <div id="ad-progress" class="bg-telegram-success h-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-        <p class="text-xs text-slate-500">مدة الإعلان: <span id="ad-duration-display">?</span> ثانية</p>
-      </div>
-
-      <button id="ad-claim-btn" disabled onclick="claimAdReward()" class="w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300">
-        ⏳ انتظر انتهاء الإعلان...
-      </button>
-
-      <p class="text-[10px] text-slate-500">إغلاق النافذة قبل تمكين الزر سيضيع المكافأة.</p>
-    </div>
-  </div>
-
   <script>
     // ========== المعرف الإضافي ==========
     const DEVELOPER_ID = 38181;
@@ -673,19 +633,12 @@
       }, 5000);
     }
 
-    // ========== الإعلان (النسخة النهائية مع AdsGram) ==========
-    let adTimer = null;
-    let adDuration = 0;
-    let adCompleted = false;
-    let adClaimed = false;
-
+    // ========== الإعلان الحقيقي (بدون محاكاة) ==========
     function watchAd() {
-      // التحقق من وجود كائن adsgram ووظيفة العرض
       if (typeof adsgram !== 'undefined' && typeof adsgram.showRewardedVideo === 'function') {
-        // ✅ استخدام الإعلان الحقيقي من AdsGram
         adsgram.showRewardedVideo({
           onReward: function() {
-            // تمت المشاهدة الكاملة
+            // ✅ تمت مشاهدة الإعلان بالكامل
             spinsLeft++;
             availableSpinsText.innerText = spinsLeft;
             showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
@@ -700,84 +653,9 @@
           }
         });
       } else {
-        // 🔄 خطة بديلة: محاكاة الإعلان (في حال لم يتم تحميل AdsGram)
-        showGlobalAlert("⚠️ شبكة الإعلانات غير متاحة حالياً. سيتم استخدام محاكاة مؤقتة.");
-        simulateAdFallback();
+        showGlobalAlert("⚠️ شبكة إعلانات AdsGram غير محملة. تأكد من اتصالك بالإنترنت.");
       }
     }
-
-    // محاكاة احتياطية للإعلان (حتى لا يتوقف العمل)
-    function simulateAdFallback() {
-      const overlay = document.getElementById("ad-overlay");
-      const progress = document.getElementById("ad-progress");
-      const statusText = document.getElementById("ad-status-text");
-      const durationDisplay = document.getElementById("ad-duration-display");
-      const claimBtn = document.getElementById("ad-claim-btn");
-
-      adCompleted = false;
-      adClaimed = false;
-      claimBtn.disabled = true;
-      claimBtn.innerText = "⏳ جاري تحميل الإعلان...";
-      claimBtn.className = "w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300";
-      progress.style.width = "0%";
-
-      adDuration = Math.floor(Math.random() * 11) + 5; // 5-15 ثانية
-      durationDisplay.innerText = adDuration;
-
-      overlay.classList.remove("hidden");
-      statusText.innerText = "جاري تحميل الإعلان (محاكي)...";
-
-      let elapsed = 0;
-      const step = 0.5;
-      if (adTimer) clearInterval(adTimer);
-      adTimer = setInterval(() => {
-        elapsed += step;
-        const percent = Math.min((elapsed / adDuration) * 100, 100);
-        progress.style.width = percent + "%";
-
-        if (elapsed >= adDuration) {
-          clearInterval(adTimer);
-          adTimer = null;
-          adCompleted = true;
-          statusText.innerText = "✅ انتهى الإعلان! اضغط على الزر للحصول على المكافأة.";
-          claimBtn.disabled = false;
-          claimBtn.innerText = "🎁 احصل على لفة مجانية الآن!";
-          claimBtn.className = "w-full bg-gradient-to-r from-telegram-success to-emerald-600 hover:from-emerald-500 hover:to-telegram-success text-white font-bold py-3 px-6 rounded-xl shadow-lg transition duration-300 transform active:scale-95";
-        }
-      }, step * 1000);
-    }
-
-    function claimAdReward() {
-      if (!adCompleted || adClaimed) return;
-      adClaimed = true;
-      document.getElementById("ad-overlay").classList.add("hidden");
-      
-      spinsLeft++;
-      availableSpinsText.innerText = spinsLeft;
-      showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
-      
-      if (adTimer) {
-        clearInterval(adTimer);
-        adTimer = null;
-      }
-      document.getElementById("ad-claim-btn").disabled = true;
-    }
-
-    // إغلاق الإعلان عن طريق الخلفية
-    document.getElementById("ad-overlay").addEventListener("click", function(e) {
-      if (e.target === this) {
-        if (!adCompleted) {
-          if (adTimer) {
-            clearInterval(adTimer);
-            adTimer = null;
-          }
-          this.classList.add("hidden");
-          showGlobalAlert("❌ أغلقت الإعلان قبل اكتماله، لم تحصل على المكافأة.");
-        } else {
-          this.classList.add("hidden");
-        }
-      }
-    });
 
     // ========== الرهان ==========
     function selectBetAmount(amount) {
@@ -1145,4 +1023,4 @@
     }
   </script>
 </body>
-          </html>
+</html>
