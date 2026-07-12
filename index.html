@@ -19,6 +19,19 @@
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+  <!-- ========== كود AdsGram الحقيقي ========== -->
+  <script src="https://adsgram.ai/js/adsgram.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      if (typeof adsgram !== 'undefined') {
+        adsgram.init({ blockId: "38181" });
+        console.log("✅ AdsGram initialized with Block ID: 38181");
+      } else {
+        console.warn("⚠️ AdsGram SDK لم يتم تحميله.");
+      }
+    });
+  </script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -467,7 +480,7 @@
     </div>
   </nav>
 
-  <!-- AD OVERLAY (معدل) -->
+  <!-- ========== طبقة الإعلان (محاكاة مؤقتة لحين ظهور AdsGram) ========== -->
   <div id="ad-overlay" class="hidden fixed inset-0 bg-slate-950/95 z-[999] flex flex-col items-center justify-center p-6 text-center">
     <div class="w-full max-w-sm bg-telegram-card border border-slate-700/60 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
       <div class="absolute -top-12 -left-12 w-24 h-24 bg-telegram-success/20 rounded-full blur-2xl"></div>
@@ -484,7 +497,6 @@
         <p class="text-xs text-slate-500">مدة الإعلان: <span id="ad-duration-display">?</span> ثانية</p>
       </div>
 
-      <!-- زر المطالبة بالمكافأة (معطل حتى انتهاء الإعلان) -->
       <button id="ad-claim-btn" disabled onclick="claimAdReward()" class="w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300">
         ⏳ انتظر انتهاء الإعلان...
       </button>
@@ -661,22 +673,47 @@
       }, 5000);
     }
 
-    // ========== الإعلان (النسخة المعدلة) ==========
+    // ========== الإعلان (النسخة النهائية مع AdsGram) ==========
     let adTimer = null;
     let adDuration = 0;
     let adCompleted = false;
     let adClaimed = false;
 
     function watchAd() {
-      if (adTimer) return; // منع فتح أكثر من إعلان
+      // التحقق من وجود كائن adsgram ووظيفة العرض
+      if (typeof adsgram !== 'undefined' && typeof adsgram.showRewardedVideo === 'function') {
+        // ✅ استخدام الإعلان الحقيقي من AdsGram
+        adsgram.showRewardedVideo({
+          onReward: function() {
+            // تمت المشاهدة الكاملة
+            spinsLeft++;
+            availableSpinsText.innerText = spinsLeft;
+            showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
+          },
+          onError: function(error) {
+            showGlobalAlert("❌ حدث خطأ في تحميل الإعلان، حاول مجدداً.");
+            console.error("AdsGram Error:", error);
+          },
+          onClose: function() {
+            // أغلق قبل اكتمال المشاهدة (لا مكافأة)
+            showGlobalAlert("⏳ أغلقت الإعلان مبكراً، لم تحصل على المكافأة.");
+          }
+        });
+      } else {
+        // 🔄 خطة بديلة: محاكاة الإعلان (في حال لم يتم تحميل AdsGram)
+        showGlobalAlert("⚠️ شبكة الإعلانات غير متاحة حالياً. سيتم استخدام محاكاة مؤقتة.");
+        simulateAdFallback();
+      }
+    }
 
+    // محاكاة احتياطية للإعلان (حتى لا يتوقف العمل)
+    function simulateAdFallback() {
       const overlay = document.getElementById("ad-overlay");
       const progress = document.getElementById("ad-progress");
       const statusText = document.getElementById("ad-status-text");
       const durationDisplay = document.getElementById("ad-duration-display");
       const claimBtn = document.getElementById("ad-claim-btn");
 
-      // إعادة ضبط
       adCompleted = false;
       adClaimed = false;
       claimBtn.disabled = true;
@@ -684,15 +721,15 @@
       claimBtn.className = "w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300";
       progress.style.width = "0%";
 
-      // مدة عشوائية بين 5 و 15 ثانية
-      adDuration = Math.floor(Math.random() * 11) + 5; // 5-15
+      adDuration = Math.floor(Math.random() * 11) + 5; // 5-15 ثانية
       durationDisplay.innerText = adDuration;
 
       overlay.classList.remove("hidden");
-      statusText.innerText = "جاري تحميل الإعلان...";
+      statusText.innerText = "جاري تحميل الإعلان (محاكي)...";
 
       let elapsed = 0;
-      const step = 0.5; // نصف ثانية
+      const step = 0.5;
+      if (adTimer) clearInterval(adTimer);
       adTimer = setInterval(() => {
         elapsed += step;
         const percent = Math.min((elapsed / adDuration) * 100, 100);
@@ -715,12 +752,10 @@
       adClaimed = true;
       document.getElementById("ad-overlay").classList.add("hidden");
       
-      // منح اللفة
       spinsLeft++;
       availableSpinsText.innerText = spinsLeft;
       showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
       
-      // تنظيف
       if (adTimer) {
         clearInterval(adTimer);
         adTimer = null;
@@ -728,14 +763,10 @@
       document.getElementById("ad-claim-btn").disabled = true;
     }
 
-    // إغلاق الإعلان يدوياً (زر X أو خلفية) – يمنع المكافأة إذا لم تكتمل
-    // نضيف مستمع لإغلاق النافذة عند الضغط خارجها، لكننا نستخدم زر الإغلاق ضمنيًا عن طريق إخفاء الخلفية.
-    // سنقوم بتعديل حدث النقر على الخلفية لإلغاء المكافأة.
+    // إغلاق الإعلان عن طريق الخلفية
     document.getElementById("ad-overlay").addEventListener("click", function(e) {
       if (e.target === this) {
-        // المستخدم نقر على الخلفية
         if (!adCompleted) {
-          // إلغاء المكافأة
           if (adTimer) {
             clearInterval(adTimer);
             adTimer = null;
@@ -743,7 +774,6 @@
           this.classList.add("hidden");
           showGlobalAlert("❌ أغلقت الإعلان قبل اكتماله، لم تحصل على المكافأة.");
         } else {
-          // الإعلان مكتمل، لكن يمكن إغلاق النافذة دون مشكلة (المكافأة باقية)
           this.classList.add("hidden");
         }
       }
@@ -1069,7 +1099,6 @@
       const toast = document.getElementById("conversion-toast");
       toast.classList.remove("hidden");
 
-      // إظهار معرف المطور في التنبيه كتأكيد
       showGlobalAlert(`تم بنجاح تحويل ${inputVal} نقطة إلى رصيد البوت الرئيسي. (معرف المطور: ${DEVELOPER_ID})`);
 
       setTimeout(() => {
@@ -1116,4 +1145,4 @@
     }
   </script>
 </body>
-</html>
+          </html>
