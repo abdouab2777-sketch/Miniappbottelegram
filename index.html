@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,18 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لعبة صيد الكنز - تليجرام</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts (Cairo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome Icons for Beautiful UI -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
@@ -90,7 +85,6 @@
 </head>
 <body class="bg-telegram-dark text-white min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-  <!-- Header Banner -->
   <header class="bg-telegram-card border-b border-slate-700/50 p-4 sticky top-0 z-50 shadow-md">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3 space-x-reverse">
@@ -108,44 +102,34 @@
     </div>
   </header>
 
-  <!-- Main Scrollable Content Container -->
   <main class="flex-grow max-w-md mx-auto w-full px-4 py-6 pb-24 overflow-y-auto">
 
-    <!-- TAB 1: WHEEL OF FORTUNE (عجلة الحظ) -->
     <section id="tab-wheel" class="tab-content space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-indigo-400">عجلة الحظ الذهبية</h2>
         <p class="text-xs text-slate-400">در العجلة واربح النقاط القيمة واستخدمها للرهانات!</p>
       </div>
 
-      <!-- Wheel Wrapper with Pointer -->
       <div class="relative w-72 h-72 mx-auto my-4 flex items-center justify-center">
-        <!-- Pointer icon -->
         <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-30 drop-shadow-lg">
           <i class="fa-solid fa-caret-down text-telegram-danger text-4xl animate-bounce"></i>
         </div>
         
-        <!-- Outer Glowing Ring -->
         <div class="absolute inset-0 rounded-full border-4 border-slate-700 glow-accent z-10 pointer-events-none"></div>
 
-        <!-- Canvas for the Wheel -->
         <canvas id="wheel" width="280" height="280" class="rounded-full shadow-2xl z-0"></canvas>
         
-        <!-- Center Cap -->
         <div class="absolute w-12 h-12 bg-slate-900 rounded-full border-4 border-slate-700 flex items-center justify-center z-20 shadow-md">
           <i class="fa-solid fa-star text-telegram-gold animate-spin" style="animation-duration: 3s"></i>
         </div>
       </div>
 
-      <!-- Control Buttons -->
       <div class="space-y-4 pt-2">
-        <!-- Spin Button -->
         <button id="btn-spin" onclick="spinWheel()" class="w-full bg-gradient-to-r from-telegram-accent to-blue-600 hover:from-blue-500 hover:to-telegram-accent text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center space-x-3 space-x-reverse glow-accent text-lg">
           <i class="fa-solid fa-arrows-spin text-xl"></i>
           <span>أدر العجلة الآن! (لفّة واحدة)</span>
         </button>
 
-        <!-- Ad Button with Counter -->
         <div class="bg-telegram-card border border-slate-700/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
           <div class="text-right">
             <h3 class="font-bold text-sm text-slate-200">بحاجة إلى لفة مجانية؟</h3>
@@ -157,27 +141,23 @@
           </button>
         </div>
 
-        <!-- Available Spins Indicator -->
         <div class="text-center text-xs text-slate-400 flex items-center justify-center space-x-2 space-x-reverse">
           <span>لفاتك المتاحة حالياً:</span>
           <span id="available-spins" class="bg-slate-800 text-telegram-accent font-bold px-3 py-1 rounded-full border border-slate-700">1</span>
         </div>
       </div>
 
-      <!-- Live Notification Box -->
       <div id="wheel-notification" class="hidden bg-slate-900/60 border border-telegram-accent/20 rounded-2xl p-4 text-center transform scale-95 transition-all duration-500">
         <p id="wheel-result-text" class="font-black text-telegram-accent text-lg"></p>
       </div>
     </section>
 
-    <!-- TAB 2: DICE BETTING (الرهان) -->
     <section id="tab-betting" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-gold to-orange-400">رهان النرد الثلاثي التنافسي</h2>
         <p class="text-xs text-slate-400">راهن بنقاطك وتنافس ضد لاعبين آخرين، صاحب أعلى مجموع نرد يفوز بكامل الرهان!</p>
       </div>
 
-      <!-- Step 1: Betting Setup Setup UI -->
       <div id="bet-setup-ui" class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
         <div class="space-y-3">
           <label class="block text-sm font-bold text-slate-300 text-right"><i class="fa-solid fa-coins text-telegram-gold ml-2"></i>كم عدد النقاط التي تريد المراهنة بها؟</label>
@@ -191,7 +171,6 @@
           </div>
         </div>
 
-        <!-- Penalty / Rules Alert box -->
         <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-300 leading-relaxed flex items-start space-x-2 space-x-reverse">
           <i class="fa-solid fa-circle-info text-base mt-0.5"></i>
           <div>
@@ -206,7 +185,6 @@
         </button>
       </div>
 
-      <!-- Step 2: Matchmaking Waiting Room UI -->
       <div id="matchmaking-ui" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6 text-center">
         <div class="py-4 space-y-3">
           <div class="relative inline-block">
@@ -217,7 +195,6 @@
           <p class="text-xs text-slate-400">نجمع حالياً المنافسين لبدء رهان الـ <span id="wait-bet-amount" class="text-telegram-gold font-bold">0</span> نقطة</p>
         </div>
 
-        <!-- Matchmaking Players Progress (3/3) -->
         <div class="bg-slate-900/60 rounded-2xl p-4 border border-slate-800">
           <div class="flex justify-between text-xs text-slate-400 mb-2">
             <span>الغرفة المفتوحة</span>
@@ -228,7 +205,6 @@
           </div>
         </div>
 
-        <!-- Players Joined Showcase -->
         <div class="grid grid-cols-3 gap-3">
           <div class="flex flex-col items-center bg-slate-800/40 p-3 rounded-xl border border-slate-700/30">
             <img id="p1-img" src="" class="w-11 h-11 rounded-full border border-telegram-accent mb-2">
@@ -254,9 +230,7 @@
         </div>
       </div>
 
-      <!-- Step 3: Game Room UI -->
       <div id="gameroom-ui" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <!-- Turn Status & Countdown -->
         <div class="flex items-center justify-between bg-slate-900/60 p-3.5 rounded-2xl border border-slate-700/30">
           <div class="text-right">
             <span id="game-status-label" class="text-xs text-slate-400">دورك الحالي لرمي النرد</span>
@@ -268,9 +242,7 @@
           </div>
         </div>
 
-        <!-- Multi-Player Dice Board Grid -->
         <div class="grid grid-cols-3 gap-2 py-2">
-          <!-- Player 1 (You) -->
           <div id="player-card-0" class="flex flex-col items-center bg-slate-800/40 p-3.5 rounded-2xl border-2 border-telegram-accent relative transition duration-300">
             <span class="absolute top-1 right-2 text-[10px] font-bold text-telegram-accent">أنت</span>
             <img id="gp1-img" src="" class="w-12 h-12 rounded-full border-2 border-telegram-accent mb-2">
@@ -284,7 +256,6 @@
             <div class="text-[10px] text-slate-400 mt-1">مجموع: <span id="gp1-total" class="font-bold text-telegram-accent text-sm">0</span></div>
           </div>
 
-          <!-- Player 2 -->
           <div id="player-card-1" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
             <img id="gp2-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
             <span id="gp2-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 2</span>
@@ -297,7 +268,6 @@
             <div class="text-[10px] text-slate-400 mt-1">مجموع: <span id="gp2-total" class="font-bold text-slate-300 text-sm">0</span></div>
           </div>
 
-          <!-- Player 3 -->
           <div id="player-card-2" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
             <img id="gp3-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
             <span id="gp3-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 3</span>
@@ -311,7 +281,6 @@
           </div>
         </div>
 
-        <!-- Main Dice Action Stage -->
         <div class="bg-slate-900/60 rounded-2xl p-6 border border-slate-800 flex flex-col items-center justify-center space-y-4">
           <div id="dice-visuals" class="flex space-x-4 space-x-reverse justify-center items-center h-20">
             <div id="die-1" class="w-14 h-14 bg-slate-800 text-telegram-gold rounded-xl border border-slate-700 flex items-center justify-center font-black text-2xl shadow-md"><i class="fa-solid fa-dice-one"></i></div>
@@ -325,13 +294,11 @@
           </button>
         </div>
 
-        <!-- Penalty Active Toast -->
         <div id="penalty-toast" class="hidden bg-red-500/15 border border-red-500/30 rounded-2xl p-3 text-center">
           <p class="text-xs text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation ml-1.5 animate-bounce"></i> تم تفعيل الرمي التلقائي! تم خصم 10% من نسبة حظك بالدورة.</p>
         </div>
       </div>
 
-      <!-- Step 4: Game Over Results Modal -->
       <div id="game-result-modal" class="hidden bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-2xl space-y-4 text-center">
         <div id="result-trophy" class="text-6xl text-telegram-gold animate-bounce py-2">
           <i class="fa-solid fa-trophy"></i>
@@ -356,7 +323,6 @@
       </div>
     </section>
 
-    <!-- TAB 3: CONVERT POINTS (تحويل نقاط) -->
     <section id="tab-convert" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-emerald-400">تحويل النقاط الفوري للبوت</h2>
@@ -364,9 +330,7 @@
       </div>
 
       <div class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <!-- Interactive Conversion Calculator -->
         <div class="space-y-4">
-          <!-- From Widget -->
           <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 relative">
             <label class="block text-xs text-slate-400 mb-1.5 text-right">رصيد نقاط التطبيق الحالي</label>
             <div class="flex items-center justify-between">
@@ -376,14 +340,12 @@
             <p class="text-[10px] text-slate-500 mt-1">الحد الأدنى للتحويل: 1,000 نقطة</p>
           </div>
 
-          <!-- Divider / Arrow -->
           <div class="flex justify-center -my-2 relative z-10">
             <div class="w-10 h-10 bg-telegram-accent text-slate-950 rounded-full border-4 border-telegram-dark flex items-center justify-center shadow-md animate-bounce">
               <i class="fa-solid fa-arrow-down-long text-lg"></i>
             </div>
           </div>
 
-          <!-- To Widget -->
           <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 relative">
             <label class="block text-xs text-slate-400 mb-1.5 text-right">ستحصل في بوت تليجرام الأساسي على</label>
             <div class="flex items-center justify-between">
@@ -394,21 +356,18 @@
           </div>
         </div>
 
-        <!-- Conversion Button -->
         <button id="btn-convert" onclick="performConversion()" class="w-full bg-gradient-to-r from-telegram-success to-emerald-600 hover:from-emerald-500 hover:to-telegram-success text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-3 space-x-reverse text-lg">
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>تحويل فوري إلى البوت الآن</span>
         </button>
       </div>
 
-      <!-- Success Notification Toast -->
       <div id="conversion-toast" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-center">
         <p class="text-sm text-telegram-success font-bold mb-1"><i class="fa-solid fa-circle-check ml-1.5"></i> تمت عملية التحويل بنجاح وبدون تأخير!</p>
         <p class="text-xs text-slate-400">تم إرسال النقاط ورصيد البوت الرئيسي محدث بالكامل الآن.</p>
       </div>
     </section>
 
-    <!-- TAB 4: SETTINGS (الإعدادات) -->
     <section id="tab-settings" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-slate-200 to-slate-400">إعدادات ملف اللاعب الشخصي</h2>
@@ -416,7 +375,6 @@
       </div>
 
       <div class="bg-telegram-card border border-slate-700/50 rounded-3xl p-6 shadow-xl space-y-6">
-        <!-- Profile Picture Selector -->
         <div class="flex flex-col items-center space-y-3">
           <label class="block text-sm font-bold text-slate-300">الصورة الرمزية الحالية</label>
           <div class="relative group">
@@ -428,13 +386,11 @@
           <span class="text-[10px] text-slate-500">اضغط على زر التبديل لتوليد وجه عشوائي مميز بالذكاء الاصطناعي</span>
         </div>
 
-        <!-- Nickname Edit Input -->
         <div class="space-y-2">
           <label class="block text-sm font-bold text-slate-300 text-right"><i class="fa-solid fa-signature text-telegram-accent ml-2"></i>اسم اللاعب المستعار</label>
-          <input id="input-username" type="text" placeholder="اكتب اسمك المستعار هنا..." value="صياد_الكنوز" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-telegram-accent text-slate-200 text-right font-bold transition">
+          <input id="input-username" type="text" placeholder="اكتب اسمك مستعار هنا..." value="صياد_الكنوز" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-telegram-accent text-slate-200 text-right font-bold transition">
         </div>
 
-        <!-- Custom Telegram Data Info -->
         <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
           <div class="flex justify-between text-slate-400">
             <span>نوع الهوية:</span>
@@ -450,7 +406,6 @@
           </div>
         </div>
 
-        <!-- Save button -->
         <button onclick="saveSettings()" class="w-full bg-slate-100 hover:bg-white text-slate-950 font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-2 space-x-reverse">
           <i class="fa-solid fa-floppy-disk text-lg"></i>
           <span>حفظ إعدادات الملف الشخصي</span>
@@ -460,10 +415,8 @@
 
   </main>
 
-  <!-- Premium Bottom Navigation Bar -->
   <nav class="bg-slate-900/95 border-t border-slate-800/80 p-3 fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md shadow-2xl">
     <div class="max-w-md mx-auto grid grid-cols-4 gap-1 text-center">
-      <!-- Wheel tab trigger -->
       <button onclick="switchTab('wheel', this)" class="nav-btn text-telegram-accent flex flex-col items-center space-y-1 transition-all duration-300">
         <div class="w-10 h-10 rounded-xl bg-telegram-accent/10 flex items-center justify-center transition">
           <i class="fa-solid fa-circle-notch text-xl"></i>
@@ -471,7 +424,6 @@
         <span class="text-[10px] font-black">عجلة الحظ</span>
       </button>
 
-      <!-- Betting tab trigger -->
       <button onclick="switchTab('betting', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center transition">
           <i class="fa-solid fa-dice text-xl"></i>
@@ -479,7 +431,6 @@
         <span class="text-[10px] font-black">الرهان</span>
       </button>
 
-      <!-- Convert tab trigger -->
       <button onclick="switchTab('convert', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center transition font-bold text-lg">
           <i class="fa-solid fa-right-left text-xl"></i>
@@ -487,7 +438,6 @@
         <span class="text-[10px] font-black">تحويل</span>
       </button>
 
-      <!-- Settings tab trigger -->
       <button onclick="switchTab('settings', this)" class="nav-btn text-slate-400 flex flex-col items-center space-y-1 transition-all duration-300">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center transition">
           <i class="fa-solid fa-gear text-xl"></i>
@@ -497,10 +447,8 @@
     </div>
   </nav>
 
-  <!-- Dummy Ad Overlay (محاكي لمشاهدة الإعلان) -->
   <div id="ad-overlay" class="hidden fixed inset-0 bg-slate-950/95 z-[999] flex flex-col items-center justify-center p-6 text-center">
     <div class="w-full max-w-sm bg-telegram-card border border-slate-700/60 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
-      <!-- Ad Decorative Background Light -->
       <div class="absolute -top-12 -left-12 w-24 h-24 bg-telegram-success/20 rounded-full blur-2xl"></div>
       
       <div class="space-y-4">
@@ -508,19 +456,14 @@
           <i class="fa-solid fa-circle-play animate-pulse"></i>
         </div>
         <h3 class="text-xl font-black text-white">إعلان فيديو ترويجي</h3>
-        <p class="text-xs text-slate-400">جاري تحميل وعرض الإعلان، يرجى الانتظار للحصول على الجائزة.</p>
+        <p id="ad-status-text" class="text-xs text-slate-400">يرجى مشاهدة الإعلان بالكامل للحصول على الجائزة...</p>
       </div>
 
-      <!-- Live Simulation Timer Progress Bar -->
-      <div class="space-y-2">
-        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-          <div id="ad-progress" class="bg-telegram-success h-full transition-all duration-1000" style="width: 0%"></div>
-        </div>
-        <p class="text-sm font-black text-telegram-success">متبقي: <span id="ad-timer">5</span> ثوانٍ</p>
+      <div class="flex justify-center py-2">
+        <div class="w-10 h-10 border-4 border-t-telegram-success border-slate-800 rounded-full animate-spin"></div>
       </div>
 
-      <!-- Warning text -->
-      <p class="text-[10px] text-slate-500">إغلاق الإعلان قبل انتهاء الوقت سيفقدك المكافأة المجانية.</p>
+      <p class="text-[10px] text-slate-500">سيتم إغلاق هذه النافذة وإعطاؤك المكافأة فور انتهاء الإعلان تماماً.</p>
     </div>
   </div>
 
@@ -531,7 +474,7 @@
     let selectedBet = 50;
     let username = "صياد_الكنوز";
     let avatarSeed = "LuckyBot";
-    let hasPenalty = false; // Is automated roll penalty active for future rolls?
+    let hasPenalty = false; 
 
     // --- Init Elements ---
     const userAvatar = document.getElementById('user-avatar');
@@ -544,13 +487,11 @@
 
     // --- Telegram Integration ---
     window.onload = function() {
-      // Connect to Telegram WebApp SDK if available
       if (window.Telegram && window.Telegram.WebApp) {
         const webapp = window.Telegram.WebApp;
         webapp.ready();
         webapp.expand();
 
-        // Get actual Telegram user data
         const telegramUser = webapp.initDataUnsafe?.user;
         if (telegramUser) {
           username = telegramUser.username || telegramUser.first_name || "لاعب_تليجرام";
@@ -566,19 +507,15 @@
         }
       }
       
-      // Draw Wheel of Fortune segments
       drawWheel();
       calculateConversion();
     };
 
     // --- Tab Switching Logic ---
     function switchTab(tabId, btnElement) {
-      // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-      // Show chosen tab
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-      // Update Nav buttons styling
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('text-telegram-accent');
         btn.classList.add('text-slate-400');
@@ -590,7 +527,7 @@
       btnElement.querySelector('div').classList.add('bg-telegram-accent/10');
     }
 
-    // --- 1. WHEEL OF FORTUNE LOGIC (عجلة الحظ) ---
+    // --- 1. WHEEL OF FORTUNE LOGIC ---
     const prizes = [
       { text: "50 نقطة", prob: 0.77, val: 50 },
       { text: "حظ أوفر", prob: 0.41, val: 0 },
@@ -625,7 +562,6 @@
         ctx.strokeStyle = '#475569';
         ctx.lineWidth = 2;
 
-        // Draw segments text labels
         ctx.save();
         ctx.rotate(i * segmentAngle + segmentAngle / 2);
         ctx.textAlign = "right";
@@ -652,7 +588,6 @@
       availableSpinsText.innerText = spinsLeft;
       isSpinning = true;
 
-      // Select target based on weighted probability simulation (Normalized)
       let sumOfWeights = prizes.reduce((acc, prize) => acc + prize.prob, 0);
       let rand = Math.random() * sumOfWeights;
       let selectedIndex = 0;
@@ -665,9 +600,8 @@
         }
       }
 
-      // Calculate final target angle to point at selected segment on top center (270 degrees)
       const stopAngle = 3 * Math.PI / 2 - (selectedIndex * segmentAngle + segmentAngle / 2);
-      const extraSpins = 5 * 2 * Math.PI; // Spin 5 times fully
+      const extraSpins = 5 * 2 * Math.PI; 
       const targetRotation = extraSpins + stopAngle;
 
       const wheelEl = document.getElementById("wheel");
@@ -678,7 +612,6 @@
         isSpinning = false;
         const prize = prizes[selectedIndex];
         
-        // Handle prize results
         const notificationBox = document.getElementById("wheel-notification");
         const resultText = document.getElementById("wheel-result-text");
         notificationBox.classList.remove("hidden");
@@ -699,36 +632,42 @@
       }, 5000);
     }
 
-    // --- 2. AD SIMULATOR (إعلانات المكافأة) ---
+    // --- 2. DYNAMIC AD WATCH LOGIC (منطق الإعلانات المطور) ---
     function watchAd() {
-      const adOverlay = document.getElementById("ad-overlay");
-      const adProgress = document.getElementById("ad-progress");
-      const adTimer = document.getElementById("ad-timer");
+      // 1. التحقق أولاً إذا كان هنالك تكامل حقيقي مع واجهة إعلانات تليجرام المربوطة بالبوت
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showAds) {
+        // إذا كان البوت يدعم واجهة الإعلانات الرسمية لتليجرام، يتم تشغيلها وانتظار النتيجة بشكل حقيقي
+        window.Telegram.WebApp.showAds({
+          onAdCompleted: function() {
+            // يتم الاستدعاء فور انتهاء الإعلان تماماً بشكل كامل وديناميكي
+            rewardUserWithSpin();
+          },
+          onAdError: function(err) {
+            showGlobalAlert("فشل تحميل الإعلان، يرجى المحاولة لاحقاً.");
+          }
+        });
+      } else {
+        // 2. الاحتياط (Fallback) في المتصفح العادي أو البيئات التجريبية: محاكاة تنتهي تلقائياً بشكل عشوائي ومرن (تحاكي انتهاء الإعلان الفعلي)
+        const adOverlay = document.getElementById("ad-overlay");
+        adOverlay.classList.remove("hidden");
 
-      adOverlay.classList.remove("hidden");
-      adProgress.style.width = "0%";
-      adTimer.innerText = "5";
+        // هنا نقوم بمحاكاة وقت إعلان متغير (بين 4 إلى 8 ثوانٍ) لتمثيل انتهاء الإعلان الطبيعي
+        const simulatedAdDuration = Math.floor(Math.random() * 4000) + 4000; 
 
-      let currentSec = 5;
-      
-      const interval = setInterval(() => {
-        currentSec--;
-        adTimer.innerText = currentSec;
-        adProgress.style.width = `${(5 - currentSec) * 20}%`;
-
-        if (currentSec <= 0) {
-          clearInterval(interval);
-          setTimeout(() => {
-            adOverlay.classList.add("hidden");
-            spinsLeft++;
-            availableSpinsText.innerText = spinsLeft;
-            showGlobalAlert("أحسنت! تمت مشاهدة الإعلان بالكامل وحصلت على لفة مجانية واحدة.");
-          }, 400);
-        }
-      }, 1000);
+        setTimeout(() => {
+          adOverlay.classList.add("hidden");
+          rewardUserWithSpin();
+        }, simulatedAdDuration);
+      }
     }
 
-    // --- 3. COMPLETED MULTIPLAYER DICE BETTING (الرهان) ---
+    function rewardUserWithSpin() {
+      spinsLeft++;
+      availableSpinsText.innerText = spinsLeft;
+      showGlobalAlert("رائع! انتهى الإعلان بنجاح وحصلت على لفة مجانية!");
+    }
+
+    // --- 3. COMPLETED MULTIPLAYER DICE BETTING ---
     function selectBetAmount(amount) {
       selectedBet = amount;
       document.querySelectorAll('.bet-chip').forEach(btn => {
@@ -752,11 +691,9 @@
         return;
       }
 
-      // Deduct bet amount immediately
       points -= selectedBet;
       globalPointsText.innerText = points;
 
-      // Hide setup screen, Show matchmaking waiting room
       document.getElementById("bet-setup-ui").classList.add("hidden");
       document.getElementById("matchmaking-ui").classList.remove("hidden");
       document.getElementById("wait-bet-amount").innerText = selectedBet;
@@ -766,7 +703,6 @@
       p1Img.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
       p1Name.innerText = username;
 
-      // Mock other players joining sequentially
       let phase = 1;
       const progress = document.getElementById("queue-progress-bar");
       const qStatus = document.getElementById("queue-status");
@@ -774,7 +710,6 @@
       lobbyTimer = setInterval(() => {
         phase++;
         if (phase === 2) {
-          // Player 2 Joins
           document.getElementById("p2-placeholder").classList.add("hidden");
           const p2Img = document.getElementById("p2-img");
           p2Img.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Nico";
@@ -787,7 +722,6 @@
           qStatus.innerText = "جاري التوصيل (2/3)";
         } 
         else if (phase === 3) {
-          // Player 3 Joins
           document.getElementById("p3-placeholder").classList.add("hidden");
           const p3Img = document.getElementById("p3-img");
           p3Img.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Shadow";
@@ -800,16 +734,14 @@
           qStatus.innerText = "تم اكتمال الفريق (3/3)";
         }
         else if (phase === 4) {
-          // All ready - transition to the actual Game Stage
           clearInterval(lobbyTimer);
           setupGameRoom();
         }
       }, 1500);
     }
 
-    // Game variables
     let gameRound = 1;
-    let turnCount = 3; // 3 rolls per player
+    let turnCount = 3; 
     let userDiceResults = [];
     let opponent1DiceResults = [];
     let opponent2DiceResults = [];
@@ -821,7 +753,6 @@
       document.getElementById("matchmaking-ui").classList.add("hidden");
       document.getElementById("gameroom-ui").classList.remove("hidden");
 
-      // Setup Player HUDs
       document.getElementById("gp1-img").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
       document.getElementById("gp1-name").innerText = username;
 
@@ -831,7 +762,6 @@
       document.getElementById("gp3-img").src = "https://api.dicebear.com/7.x/bottts/svg?seed=Shadow";
       document.getElementById("gp3-name").innerText = "صقر_الصحراء";
 
-      // Reset Values
       userDiceResults = [];
       opponent1DiceResults = [];
       opponent2DiceResults = [];
@@ -852,7 +782,6 @@
 
         if (countdownVal <= 0) {
           clearInterval(gameTimer);
-          // Auto roll if player delayed
           if (!hasRolledThisTurn) {
             triggerAutomatedRollPenalty();
           }
@@ -864,10 +793,8 @@
       hasPenalty = true;
       document.getElementById("penalty-toast").classList.remove("hidden");
       
-      // Auto Roll remaining dices instantly
       while(turnCount > 0) {
-        // Roll with penalty (capped maximums to simulate 10% lower luck factor)
-        let r1 = Math.floor(Math.random() * 5) + 1; // max 5
+        let r1 = Math.floor(Math.random() * 5) + 1; 
         let r2 = Math.floor(Math.random() * 5) + 1;
         let r3 = Math.floor(Math.random() * 5) + 1;
         
@@ -875,7 +802,6 @@
         turnCount--;
       }
 
-      // Simulate instantly and finalize game
       finalizeDiceResults();
     }
 
@@ -884,7 +810,6 @@
       hasRolledThisTurn = true;
       clearInterval(gameTimer);
 
-      // Animate dice rolling visuals
       const d1 = document.getElementById("die-1");
       const d2 = document.getElementById("die-2");
       const d3 = document.getElementById("die-3");
@@ -898,12 +823,10 @@
         d2.classList.remove("rolling");
         d3.classList.remove("rolling");
 
-        // Roll values 1-6
         let r1 = Math.floor(Math.random() * 6) + 1;
         let r2 = Math.floor(Math.random() * 6) + 1;
         let r3 = Math.floor(Math.random() * 6) + 1;
 
-        // Apply penalty if previously triggered
         if (hasPenalty) {
           r1 = Math.max(1, r1 - 1);
           r2 = Math.max(1, r2 - 1);
@@ -911,16 +834,13 @@
 
         userDiceResults.push(r1, r2, r3);
 
-        // Render current dice visuals
         d1.innerHTML = getDiceIcon(r1);
         d2.innerHTML = getDiceIcon(r2);
         d3.innerHTML = getDiceIcon(r3);
 
-        // Update current player scorecard UI
         const currentRollIndex = 3 - turnCount;
         document.getElementById(`gp1-d${currentRollIndex + 1}`).innerText = userDiceResults[userDiceResults.length - 1];
 
-        // Sum current player total
         const userSum = userDiceResults.reduce((a, b) => a + b, 0);
         document.getElementById("gp1-total").innerText = userSum;
 
@@ -931,7 +851,6 @@
           hasRolledThisTurn = false;
           startTurnCountdown();
         } else {
-          // Play simulated opponent rolls
           simulateOpponentsTurn();
         }
       }, 800);
@@ -954,7 +873,6 @@
       document.getElementById("game-status-title").innerText = "خصومك يرمون النرد الآن...";
 
       setTimeout(() => {
-        // Player 2 rolls
         opponent1DiceResults = [
           Math.floor(Math.random() * 6) + 1,
           Math.floor(Math.random() * 6) + 1,
@@ -966,7 +884,6 @@
         const sum2 = opponent1DiceResults.reduce((a, b) => a + b, 0);
         document.getElementById("gp2-total").innerText = sum2;
 
-        // Player 3 rolls
         opponent2DiceResults = [
           Math.floor(Math.random() * 6) + 1,
           Math.floor(Math.random() * 6) + 1,
@@ -986,7 +903,6 @@
     }
 
     function finalizeDiceResults() {
-      // Hide active gameroom
       document.getElementById("gameroom-ui").classList.add("hidden");
       document.getElementById("game-result-modal").classList.remove("hidden");
 
@@ -1002,9 +918,7 @@
 
       yourFinalSumText.innerText = userSum;
 
-      // Determine Winner
       if (userSum >= sum2 && userSum >= sum3) {
-        // You won!
         const winnings = selectedBet * 3;
         points += winnings;
         globalPointsText.innerText = points;
@@ -1016,7 +930,6 @@
         totalPrizeText.innerText = `+${winnings} نقطة`;
         totalPrizeText.className = "font-bold text-telegram-success";
       } else {
-        // You lost
         trophy.innerHTML = '<i class="fa-solid fa-circle-xmark text-telegram-danger text-6xl"></i>';
         title.innerText = "😢 حظاً أوفر!";
         title.className = "text-2xl font-black text-telegram-danger";
@@ -1031,7 +944,6 @@
       document.getElementById("penalty-toast").classList.add("hidden");
       document.getElementById("bet-setup-ui").classList.remove("hidden");
       
-      // Reset game visual placeholders
       document.getElementById("gp1-total").innerText = "0";
       document.getElementById("gp2-total").innerText = "0";
       document.getElementById("gp3-total").innerText = "0";
@@ -1043,8 +955,7 @@
       }
     }
 
-
-    // --- 4. CONVERSION CALCULATOR LOGIC (تحويل نقاط) ---
+    // --- 4. CONVERSION CALCULATOR LOGIC ---
     function calculateConversion() {
       const input = document.getElementById("input-app-points").value;
       const output = document.getElementById("output-bot-points");
@@ -1070,7 +981,6 @@
         return;
       }
 
-      // Process Conversion
       points -= inputVal;
       globalPointsText.innerText = points;
 
@@ -1084,9 +994,8 @@
       }, 5000);
     }
 
-    // --- 5. SETTINGS AND PROFILE SAVE (الإعدادات) ---
+    // --- 5. SETTINGS AND PROFILE SAVE ---
     function changeAvatarSeed() {
-      // Random seed for Dicebear bottts generator
       avatarSeed = Math.random().toString(36).substring(7);
       const newAvatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
       settingsAvatarPreview.src = newAvatarUrl;
@@ -1108,14 +1017,13 @@
 
     // --- Global Custom In-App Alerts ---
     function showGlobalAlert(msg) {
-      if (window.Telegram && window.Telegram.WebApp) {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showPopup) {
         window.Telegram.WebApp.showPopup({
           title: "إشعار الكنز",
           message: msg,
           buttons: [{ type: "ok", text: "موافق" }]
         });
       } else {
-        // Fallback for browsers
         const alertBox = document.createElement("div");
         alertBox.className = "fixed top-5 left-1/2 transform -translate-x-1/2 bg-telegram-card border-2 border-telegram-accent text-white px-6 py-3.5 rounded-2xl shadow-2xl z-[99999] text-sm text-center font-bold glow-accent animate-bounce";
         alertBox.innerHTML = `<i class="fa-solid fa-bell text-telegram-accent ml-2"></i> ${msg}`;
@@ -1126,5 +1034,3 @@
   </script>
 </body>
 </html>
-
-```
