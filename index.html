@@ -5,14 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لعبة صيد الكنز - تليجرام</title>
   
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Google Fonts (Cairo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
@@ -44,7 +48,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     
-    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -56,7 +59,6 @@
       border-radius: 10px;
     }
 
-    /* Glow effect */
     .glow-accent {
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
     }
@@ -64,12 +66,10 @@
       box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
     }
     
-    /* Wheel transitions */
     #wheel {
       transition: transform 5s cubic-bezier(0.1, 0.8, 0.1, 1);
     }
 
-    /* Dice rolling animation */
     @keyframes roll {
       0% { transform: scale(1) rotate(0deg); }
       20% { transform: scale(1.2) rotate(72deg); }
@@ -81,10 +81,26 @@
     .rolling {
       animation: roll 0.6s ease-in-out infinite;
     }
+
+    /* تنسيق زر الإعلان المعطل/المفعل */
+    #ad-claim-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
+    #ad-claim-btn:enabled {
+      animation: pulse-green 1.5s infinite;
+    }
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
   </style>
 </head>
 <body class="bg-telegram-dark text-white min-h-screen flex flex-col justify-between overflow-x-hidden">
 
+  <!-- Header Banner -->
   <header class="bg-telegram-card border-b border-slate-700/50 p-4 sticky top-0 z-50 shadow-md">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3 space-x-reverse">
@@ -102,8 +118,10 @@
     </div>
   </header>
 
+  <!-- Main Content -->
   <main class="flex-grow max-w-md mx-auto w-full px-4 py-6 pb-24 overflow-y-auto">
 
+    <!-- TAB 1: WHEEL -->
     <section id="tab-wheel" class="tab-content space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-indigo-400">عجلة الحظ الذهبية</h2>
@@ -114,11 +132,8 @@
         <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-30 drop-shadow-lg">
           <i class="fa-solid fa-caret-down text-telegram-danger text-4xl animate-bounce"></i>
         </div>
-        
         <div class="absolute inset-0 rounded-full border-4 border-slate-700 glow-accent z-10 pointer-events-none"></div>
-
         <canvas id="wheel" width="280" height="280" class="rounded-full shadow-2xl z-0"></canvas>
-        
         <div class="absolute w-12 h-12 bg-slate-900 rounded-full border-4 border-slate-700 flex items-center justify-center z-20 shadow-md">
           <i class="fa-solid fa-star text-telegram-gold animate-spin" style="animation-duration: 3s"></i>
         </div>
@@ -152,6 +167,7 @@
       </div>
     </section>
 
+    <!-- TAB 2: BETTING -->
     <section id="tab-betting" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-gold to-orange-400">رهان النرد الثلاثي التنافسي</h2>
@@ -247,7 +263,6 @@
             <span class="absolute top-1 right-2 text-[10px] font-bold text-telegram-accent">أنت</span>
             <img id="gp1-img" src="" class="w-12 h-12 rounded-full border-2 border-telegram-accent mb-2">
             <span id="gp1-name" class="text-xs font-bold truncate max-w-full mb-1">أنت</span>
-            
             <div class="flex space-x-1 space-x-reverse justify-center my-2">
               <span id="gp1-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
               <span id="gp1-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
@@ -259,7 +274,6 @@
           <div id="player-card-1" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
             <img id="gp2-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
             <span id="gp2-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 2</span>
-            
             <div class="flex space-x-1 space-x-reverse justify-center my-2">
               <span id="gp2-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
               <span id="gp2-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
@@ -271,7 +285,6 @@
           <div id="player-card-2" class="flex flex-col items-center bg-slate-800/20 p-3.5 rounded-2xl border border-transparent transition duration-300">
             <img id="gp3-img" src="" class="w-12 h-12 rounded-full border border-slate-700 mb-2">
             <span id="gp3-name" class="text-xs font-bold truncate max-w-full mb-1">لاعب 3</span>
-            
             <div class="flex space-x-1 space-x-reverse justify-center my-2">
               <span id="gp3-d1" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
               <span id="gp3-d2" class="w-6 h-6 bg-slate-900 text-slate-400 rounded flex items-center justify-center font-bold text-xs border border-slate-700">-</span>
@@ -323,6 +336,7 @@
       </div>
     </section>
 
+    <!-- TAB 3: CONVERT -->
     <section id="tab-convert" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-telegram-accent to-emerald-400">تحويل النقاط الفوري للبوت</h2>
@@ -368,6 +382,7 @@
       </div>
     </section>
 
+    <!-- TAB 4: SETTINGS -->
     <section id="tab-settings" class="tab-content hidden space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-slate-200 to-slate-400">إعدادات ملف اللاعب الشخصي</h2>
@@ -388,7 +403,7 @@
 
         <div class="space-y-2">
           <label class="block text-sm font-bold text-slate-300 text-right"><i class="fa-solid fa-signature text-telegram-accent ml-2"></i>اسم اللاعب المستعار</label>
-          <input id="input-username" type="text" placeholder="اكتب اسمك مستعار هنا..." value="صياد_الكنوز" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-telegram-accent text-slate-200 text-right font-bold transition">
+          <input id="input-username" type="text" placeholder="اكتب اسمك المستعار هنا..." value="صياد_الكنوز" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-telegram-accent text-slate-200 text-right font-bold transition">
         </div>
 
         <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
@@ -404,6 +419,10 @@
             <span>الحساب المربوط:</span>
             <span id="telegram-id" class="font-bold text-slate-300">حساب تليجرام</span>
           </div>
+          <div class="flex justify-between text-slate-400">
+            <span>معرف المطور:</span>
+            <span class="font-bold text-telegram-accent">38181</span>
+          </div>
         </div>
 
         <button onclick="saveSettings()" class="w-full bg-slate-100 hover:bg-white text-slate-950 font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition duration-200 transform active:scale-95 flex items-center justify-center space-x-2 space-x-reverse">
@@ -415,6 +434,7 @@
 
   </main>
 
+  <!-- Bottom Navigation -->
   <nav class="bg-slate-900/95 border-t border-slate-800/80 p-3 fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md shadow-2xl">
     <div class="max-w-md mx-auto grid grid-cols-4 gap-1 text-center">
       <button onclick="switchTab('wheel', this)" class="nav-btn text-telegram-accent flex flex-col items-center space-y-1 transition-all duration-300">
@@ -447,6 +467,7 @@
     </div>
   </nav>
 
+  <!-- AD OVERLAY (معدل) -->
   <div id="ad-overlay" class="hidden fixed inset-0 bg-slate-950/95 z-[999] flex flex-col items-center justify-center p-6 text-center">
     <div class="w-full max-w-sm bg-telegram-card border border-slate-700/60 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
       <div class="absolute -top-12 -left-12 w-24 h-24 bg-telegram-success/20 rounded-full blur-2xl"></div>
@@ -456,27 +477,35 @@
           <i class="fa-solid fa-circle-play animate-pulse"></i>
         </div>
         <h3 class="text-xl font-black text-white">إعلان فيديو ترويجي</h3>
-        <p id="ad-status-text" class="text-xs text-slate-400">يرجى مشاهدة الإعلان بالكامل للحصول على الجائزة...</p>
+        <p id="ad-status-text" class="text-xs text-slate-400">جاري تحميل الإعلان، يرجى الانتظار...</p>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="ad-progress" class="bg-telegram-success h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <p class="text-xs text-slate-500">مدة الإعلان: <span id="ad-duration-display">?</span> ثانية</p>
       </div>
 
-      <div class="flex justify-center py-2">
-        <div class="w-10 h-10 border-4 border-t-telegram-success border-slate-800 rounded-full animate-spin"></div>
-      </div>
+      <!-- زر المطالبة بالمكافأة (معطل حتى انتهاء الإعلان) -->
+      <button id="ad-claim-btn" disabled onclick="claimAdReward()" class="w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300">
+        ⏳ انتظر انتهاء الإعلان...
+      </button>
 
-      <p class="text-[10px] text-slate-500">سيتم إغلاق هذه النافذة وإعطاؤك المكافأة فور انتهاء الإعلان تماماً.</p>
+      <p class="text-[10px] text-slate-500">إغلاق النافذة قبل تمكين الزر سيضيع المكافأة.</p>
     </div>
   </div>
 
   <script>
-    // --- Global Game State ---
+    // ========== المعرف الإضافي ==========
+    const DEVELOPER_ID = 38181;
+
+    // ========== الحالة العامة ==========
     let points = 2500;
     let spinsLeft = 1;
     let selectedBet = 50;
     let username = "صياد_الكنوز";
     let avatarSeed = "LuckyBot";
-    let hasPenalty = false; 
+    let hasPenalty = false;
 
-    // --- Init Elements ---
+    // ========== العناصر ==========
     const userAvatar = document.getElementById('user-avatar');
     const userDisplayName = document.getElementById('user-display-name');
     const globalPointsText = document.getElementById('global-points');
@@ -485,7 +514,7 @@
     const settingsAvatarPreview = document.getElementById('settings-avatar-preview');
     const telegramIdLabel = document.getElementById('telegram-id');
 
-    // --- Telegram Integration ---
+    // ========== تهيئة تليجرام ==========
     window.onload = function() {
       if (window.Telegram && window.Telegram.WebApp) {
         const webapp = window.Telegram.WebApp;
@@ -511,7 +540,7 @@
       calculateConversion();
     };
 
-    // --- Tab Switching Logic ---
+    // ========== التنقل بين التبويبات ==========
     function switchTab(tabId, btnElement) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -527,7 +556,7 @@
       btnElement.querySelector('div').classList.add('bg-telegram-accent/10');
     }
 
-    // --- 1. WHEEL OF FORTUNE LOGIC ---
+    // ========== عجلة الحظ ==========
     const prizes = [
       { text: "50 نقطة", prob: 0.77, val: 50 },
       { text: "حظ أوفر", prob: 0.41, val: 0 },
@@ -601,7 +630,7 @@
       }
 
       const stopAngle = 3 * Math.PI / 2 - (selectedIndex * segmentAngle + segmentAngle / 2);
-      const extraSpins = 5 * 2 * Math.PI; 
+      const extraSpins = 5 * 2 * Math.PI;
       const targetRotation = extraSpins + stopAngle;
 
       const wheelEl = document.getElementById("wheel");
@@ -632,42 +661,95 @@
       }, 5000);
     }
 
-    // --- 2. DYNAMIC AD WATCH LOGIC (منطق الإعلانات المطور) ---
+    // ========== الإعلان (النسخة المعدلة) ==========
+    let adTimer = null;
+    let adDuration = 0;
+    let adCompleted = false;
+    let adClaimed = false;
+
     function watchAd() {
-      // 1. التحقق أولاً إذا كان هنالك تكامل حقيقي مع واجهة إعلانات تليجرام المربوطة بالبوت
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showAds) {
-        // إذا كان البوت يدعم واجهة الإعلانات الرسمية لتليجرام، يتم تشغيلها وانتظار النتيجة بشكل حقيقي
-        window.Telegram.WebApp.showAds({
-          onAdCompleted: function() {
-            // يتم الاستدعاء فور انتهاء الإعلان تماماً بشكل كامل وديناميكي
-            rewardUserWithSpin();
-          },
-          onAdError: function(err) {
-            showGlobalAlert("فشل تحميل الإعلان، يرجى المحاولة لاحقاً.");
-          }
-        });
-      } else {
-        // 2. الاحتياط (Fallback) في المتصفح العادي أو البيئات التجريبية: محاكاة تنتهي تلقائياً بشكل عشوائي ومرن (تحاكي انتهاء الإعلان الفعلي)
-        const adOverlay = document.getElementById("ad-overlay");
-        adOverlay.classList.remove("hidden");
+      if (adTimer) return; // منع فتح أكثر من إعلان
 
-        // هنا نقوم بمحاكاة وقت إعلان متغير (بين 4 إلى 8 ثوانٍ) لتمثيل انتهاء الإعلان الطبيعي
-        const simulatedAdDuration = Math.floor(Math.random() * 4000) + 4000; 
+      const overlay = document.getElementById("ad-overlay");
+      const progress = document.getElementById("ad-progress");
+      const statusText = document.getElementById("ad-status-text");
+      const durationDisplay = document.getElementById("ad-duration-display");
+      const claimBtn = document.getElementById("ad-claim-btn");
 
-        setTimeout(() => {
-          adOverlay.classList.add("hidden");
-          rewardUserWithSpin();
-        }, simulatedAdDuration);
-      }
+      // إعادة ضبط
+      adCompleted = false;
+      adClaimed = false;
+      claimBtn.disabled = true;
+      claimBtn.innerText = "⏳ جاري تحميل الإعلان...";
+      claimBtn.className = "w-full bg-slate-700 text-slate-400 font-bold py-3 px-6 rounded-xl transition duration-300";
+      progress.style.width = "0%";
+
+      // مدة عشوائية بين 5 و 15 ثانية
+      adDuration = Math.floor(Math.random() * 11) + 5; // 5-15
+      durationDisplay.innerText = adDuration;
+
+      overlay.classList.remove("hidden");
+      statusText.innerText = "جاري تحميل الإعلان...";
+
+      let elapsed = 0;
+      const step = 0.5; // نصف ثانية
+      adTimer = setInterval(() => {
+        elapsed += step;
+        const percent = Math.min((elapsed / adDuration) * 100, 100);
+        progress.style.width = percent + "%";
+
+        if (elapsed >= adDuration) {
+          clearInterval(adTimer);
+          adTimer = null;
+          adCompleted = true;
+          statusText.innerText = "✅ انتهى الإعلان! اضغط على الزر للحصول على المكافأة.";
+          claimBtn.disabled = false;
+          claimBtn.innerText = "🎁 احصل على لفة مجانية الآن!";
+          claimBtn.className = "w-full bg-gradient-to-r from-telegram-success to-emerald-600 hover:from-emerald-500 hover:to-telegram-success text-white font-bold py-3 px-6 rounded-xl shadow-lg transition duration-300 transform active:scale-95";
+        }
+      }, step * 1000);
     }
 
-    function rewardUserWithSpin() {
+    function claimAdReward() {
+      if (!adCompleted || adClaimed) return;
+      adClaimed = true;
+      document.getElementById("ad-overlay").classList.add("hidden");
+      
+      // منح اللفة
       spinsLeft++;
       availableSpinsText.innerText = spinsLeft;
-      showGlobalAlert("رائع! انتهى الإعلان بنجاح وحصلت على لفة مجانية!");
+      showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
+      
+      // تنظيف
+      if (adTimer) {
+        clearInterval(adTimer);
+        adTimer = null;
+      }
+      document.getElementById("ad-claim-btn").disabled = true;
     }
 
-    // --- 3. COMPLETED MULTIPLAYER DICE BETTING ---
+    // إغلاق الإعلان يدوياً (زر X أو خلفية) – يمنع المكافأة إذا لم تكتمل
+    // نضيف مستمع لإغلاق النافذة عند الضغط خارجها، لكننا نستخدم زر الإغلاق ضمنيًا عن طريق إخفاء الخلفية.
+    // سنقوم بتعديل حدث النقر على الخلفية لإلغاء المكافأة.
+    document.getElementById("ad-overlay").addEventListener("click", function(e) {
+      if (e.target === this) {
+        // المستخدم نقر على الخلفية
+        if (!adCompleted) {
+          // إلغاء المكافأة
+          if (adTimer) {
+            clearInterval(adTimer);
+            adTimer = null;
+          }
+          this.classList.add("hidden");
+          showGlobalAlert("❌ أغلقت الإعلان قبل اكتماله، لم تحصل على المكافأة.");
+        } else {
+          // الإعلان مكتمل، لكن يمكن إغلاق النافذة دون مشكلة (المكافأة باقية)
+          this.classList.add("hidden");
+        }
+      }
+    });
+
+    // ========== الرهان ==========
     function selectBetAmount(amount) {
       selectedBet = amount;
       document.querySelectorAll('.bet-chip').forEach(btn => {
@@ -741,7 +823,7 @@
     }
 
     let gameRound = 1;
-    let turnCount = 3; 
+    let turnCount = 3;
     let userDiceResults = [];
     let opponent1DiceResults = [];
     let opponent2DiceResults = [];
@@ -794,7 +876,7 @@
       document.getElementById("penalty-toast").classList.remove("hidden");
       
       while(turnCount > 0) {
-        let r1 = Math.floor(Math.random() * 5) + 1; 
+        let r1 = Math.floor(Math.random() * 5) + 1;
         let r2 = Math.floor(Math.random() * 5) + 1;
         let r3 = Math.floor(Math.random() * 5) + 1;
         
@@ -955,7 +1037,7 @@
       }
     }
 
-    // --- 4. CONVERSION CALCULATOR LOGIC ---
+    // ========== تحويل النقاط ==========
     function calculateConversion() {
       const input = document.getElementById("input-app-points").value;
       const output = document.getElementById("output-bot-points");
@@ -987,14 +1069,15 @@
       const toast = document.getElementById("conversion-toast");
       toast.classList.remove("hidden");
 
-      showGlobalAlert(`تم بنجاح تحويل ${inputVal} نقطة إلى رصيد البوت الرئيسي!`);
+      // إظهار معرف المطور في التنبيه كتأكيد
+      showGlobalAlert(`تم بنجاح تحويل ${inputVal} نقطة إلى رصيد البوت الرئيسي. (معرف المطور: ${DEVELOPER_ID})`);
 
       setTimeout(() => {
         toast.classList.add("hidden");
       }, 5000);
     }
 
-    // --- 5. SETTINGS AND PROFILE SAVE ---
+    // ========== الإعدادات ==========
     function changeAvatarSeed() {
       avatarSeed = Math.random().toString(36).substring(7);
       const newAvatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
@@ -1015,9 +1098,9 @@
       showGlobalAlert("تم حفظ وتحديث بيانات ملفك الشخصي بنجاح!");
     }
 
-    // --- Global Custom In-App Alerts ---
+    // ========== التنبيهات العامة ==========
     function showGlobalAlert(msg) {
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showPopup) {
+      if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.showPopup({
           title: "إشعار الكنز",
           message: msg,
