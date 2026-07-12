@@ -19,18 +19,9 @@
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- ========== كود AdsGram الحقيقي ========== -->
-  <script src="https://adsgram.ai/js/adsgram.js"></script>
-  <script>
-    window.addEventListener('load', function() {
-      if (typeof adsgram !== 'undefined') {
-        adsgram.init({ blockId: "38181" });
-        console.log("✅ AdsGram initialized with Block ID: 38181");
-      } else {
-        console.warn("⚠️ AdsGram SDK لم يتم تحميله.");
-      }
-    });
-  </script>
+  <!-- ========== كود AdsGram المُحدّث (المستقر) ========== -->
+  <!-- تم تغيير الرابط إلى الإصدار المستقر الجديد -->
+  <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
 
   <script>
     tailwind.config = {
@@ -633,29 +624,44 @@
       }, 5000);
     }
 
-    // ========== الإعلان الحقيقي (بدون محاكاة) ==========
+    // ============================================================
+    // ========== الإعلان الحقيقي (المعدل حسب التحليل) ==========
+    // ============================================================
     function watchAd() {
-      if (typeof adsgram !== 'undefined' && typeof adsgram.showRewardedVideo === 'function') {
-        adsgram.showRewardedVideo({
-          onReward: function() {
-            // ✅ تمت مشاهدة الإعلان بالكامل
+      // 1. التأكد أن مكتبة AdsGram تم تحميلها
+      if (typeof adsgram !== 'undefined' && typeof adsgram.init === 'function') {
+        try {
+          // 2. تهيئة الإعلان بالـ Block ID الصحيح (38181)
+          const AdController = adsgram.init({ blockId: "38181" });
+          
+          // 3. عرض الإعلان ومعالجة النتائج عبر .show()
+          AdController.show().then((result) => {
+            // ✅ المستخدم شاهد الإعلان بالكامل (onReward)
             spinsLeft++;
-            availableSpinsText.innerText = spinsLeft;
+            if (document.getElementById('available-spins')) {
+              document.getElementById('available-spins').innerText = spinsLeft;
+            }
             showGlobalAlert("🎉 أحسنت! حصلت على لفة مجانية من الإعلان.");
-          },
-          onError: function(error) {
-            showGlobalAlert("❌ حدث خطأ في تحميل الإعلان، حاول مجدداً.");
-            console.error("AdsGram Error:", error);
-          },
-          onClose: function() {
-            // أغلق قبل اكتمال المشاهدة (لا مكافأة)
-            showGlobalAlert("⏳ أغلقت الإعلان مبكراً، لم تحصل على المكافأة.");
-          }
-        });
+          }).catch((error) => {
+            // معالجة الأخطاء (onError / onClose)
+            if (error.code === 'USER_CLOSE') {
+              showGlobalAlert("⏳ أغلقت الإعلان مبكراً، لم تحصل على المكافأة.");
+            } else {
+              showGlobalAlert("❌ لم تتوفر إعلانات حالياً، حاول مجدداً بعد قليل.");
+              console.error("AdsGram show error:", error);
+            }
+          });
+
+        } catch (e) {
+          showGlobalAlert("❌ فشل في إنشاء وحدة الإعلان، يرجى مراجعة الـ Block ID.");
+          console.error(e);
+        }
       } else {
-        showGlobalAlert("⚠️ شبكة إعلانات AdsGram غير محملة. تأكد من اتصالك بالإنترنت.");
+        // الرسالة التي تظهر لك الآن بسبب فشل تحميل السكريبت في البداية
+        showGlobalAlert("⚠️ شبكة إعلانات AdsGram غير محملة. يرجى تحديث التطبيق أو استخدام اتصال إنترنت آخر بدون مانع إعلانات.");
       }
     }
+
 
     // ========== الرهان ==========
     function selectBetAmount(amount) {
