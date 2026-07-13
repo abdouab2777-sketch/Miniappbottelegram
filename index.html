@@ -52,14 +52,14 @@
       </div>
 
       <div class="space-y-3">
-        <button onclick="watchAdAndExecute('continue')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center space-x-2 space-x-reverse shadow-lg transition duration-200 transform active:scale-95">
+        <a id="ad-continue-btn" href="https://www.effectivecpmnetwork.com/t9522wu9e?key=a67ec5fc180e7ac4a44ebabb725a3299" target="_blank" onclick="executeAction('continue')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center space-x-2 space-x-reverse shadow-lg transition duration-200 transform active:scale-95 text-white decoration-none">
           <i class="fa-solid fa-circle-play text-xl"></i>
           <span>شاهد إعلان وتابع اللعب بنفس النقاط</span>
-        </button>
+        </a>
 
-        <button onclick="watchAdAndExecute('newgame')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-2xl border border-slate-700 transition">
-          مباراة جديدة (شاهد إعلان وابدأ)
-        </button>
+        <a id="ad-newgame-btn" href="https://www.effectivecpmnetwork.com/t9522wu9e?key=a67ec5fc180e7ac4a44ebabb725a3299" target="_blank" onclick="executeAction('newgame')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-2xl border border-slate-700 transition flex items-center justify-center space-x-2 space-x-reverse decoration-none">
+          <span>مباراة جديدة (شاهد إعلان وابدأ)</span>
+        </a>
       </div>
     </div>
   </div>
@@ -71,9 +71,6 @@
     let currentPieces = [];
     let selectedPieceIndex = null;
     let isGameOver = false;
-
-    // الرابط التوكن الإعلاني الحقيقي الخاص بك من Adsterra
-    const AD_URL = "Https://www.effectivecpmnetwork.com/t9522wu9e?key=a67ec5fc180e7ac4a44ebabb725a3299";
 
     const SHAPES = [
       [[1]], [[1, 1]], [[1], [1]], [[1, 1, 1]], [[1, 1], [1, 1]], [[1, 0], [1, 1]], [[1, 1, 1], [0, 1, 0]]
@@ -99,22 +96,16 @@
       }
     }
 
-    // 🚀 دالة التشغيل الذكية الفورية: تفتح الإعلان فوراً بناءً على ضغطة المستخدم لتفادي حظر المتصفح
-    function watchAdAndExecute(actionType) {
-      // 1. فتح الإعلان فوراً في صفحة جديدة (مستحيل حظره لأن النقر مباشر)
-      window.open(AD_URL, '_blank');
-
-      // 2. إغلاق القائمة المنبثقة للخسارة
+    // هذه الدالة تنفذ الإجراء البرمجي في اللعبة بالتوازي مع فتح الرابط الحقيقي للمعلن
+    function executeAction(actionType) {
+      // إخفاء نافذة الخسارة فوراً
       document.getElementById("game-over-modal").classList.add("hidden");
 
-      // 3. تنفيذ الإجراء المطلوب بعد فتح الإعلان
       if (actionType === 'continue') {
-        // إكمال اللعب وتوليد قطع جديدة له لإنقاذه
         isGameOver = false;
-        generatePieces();
+        generatePieces(); // إنقاذ اللاعب بقطع جديدة
       } else if (actionType === 'newgame') {
-        // تصفير اللعبة وبدء مباراة جديدة تماماً
-        resetGameData();
+        resetGameData(); // تصفير اللعبة وبدء مباراة جديدة
       }
     }
 
